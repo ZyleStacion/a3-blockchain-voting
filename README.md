@@ -14,6 +14,22 @@
 	- See who voted (alias - ZKP)
 7. Profile (opt.) -> Database
 
+## Pages
+Static Contents
+	1. Landing
+		1. There is currently XX amount of money in the pot...
+		2. Technical info
+	2. Profile
+		1. Dashboard
+		2. Login
+		3. Signup
+	3. Voting form (select from like 4 or 5 charities)
+ 	4. 
+Dynamic Contents:
+	1. Post-voting live result counter (opt)
+	2. Admin dashboard
+	3. Blockchain view - can be in the console
+
 ## Created by
 - Kim ‘Jay’ JongOh s3726103
 - Thinh Nguyen Huynh Trieu s3977756 
