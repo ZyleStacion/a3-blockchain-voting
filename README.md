@@ -24,7 +24,7 @@ Static Contents
 		2. Login
 		3. Signup
 	3. Voting form (select from like 4 or 5 charities)
- 	4. 
+
 Dynamic Contents:
 	1. Post-voting live result counter (opt)
 	2. Admin dashboard
@@ -34,3 +34,4 @@ Dynamic Contents:
 - Kim ‘Jay’ JongOh s3726103
 - Thinh Nguyen Huynh Trieu s3977756 
 - Zyle Estacion s4064846 
+
