@@ -1,8 +1,8 @@
 from fastapi import APIRouter, HTTPException, Depends
-from DB.database import users_collection
-from DB.schemas import UserCreate, UserLogin, UserResponse
+from db.database import users_collection
+from db.schemas import UserCreate, UserLogin, UserResponse
 from bson import ObjectId
-from backend.utils.DigitalSignature import generate_key
+from utils.DigitalSignature import generate_key
 
 router = APIRouter(prefix="/auth", tags=["Authentication"])
 
