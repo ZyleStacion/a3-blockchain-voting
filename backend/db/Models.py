@@ -17,5 +17,6 @@ class Vote(BaseModel):
     tickets: int   # quadratic voting = tickets^2
 
 class Transaction(BaseModel):
+    transaction_id: str
     user_id: str
     amount: float
