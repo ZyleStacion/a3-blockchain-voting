@@ -4,6 +4,9 @@
   "description": "1. Voting -> Blockchain\r \t- Users sign each vote\r 2. Ticket purchasing w/ quadratic voting\r 3. Login + Logout\r 4. Registration\r \t- Each user has a key-pair\r 5. Transactions -> Blockchain\r \t- Dummy data\r \t- Users sign each transaction\r 6. Voting results\r \t- See who voted (alias - ZKP)\r 7. Profile (opt.) -> Database",
   "main": "index.js",
   "dependencies": {
+    "@chakra-ui/react": "^3.26.0",
+    "@emotion/react": "^11.14.0",
+    "@emotion/styled": "^11.14.1",
     "acorn": "^8.15.0",
     "acorn-jsx": "^5.3.2",
     "ajv": "^6.12.6",
@@ -45,6 +48,7 @@
     "find-up": "^5.0.0",
     "flat-cache": "^4.0.1",
     "flatted": "^3.3.3",
+    "framer-motion": "^12.23.12",
     "gensync": "^1.0.0-beta.2",
     "glob-parent": "^6.0.2",
     "globals": "^16.3.0",
@@ -105,7 +109,6 @@
     "yallist": "^3.1.1",
     "yocto-queue": "^0.1.0"
   },
-  "devDependencies": {},
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "dev": "cd frontend && npm run dev",

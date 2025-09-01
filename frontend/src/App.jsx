@@ -1,31 +1,39 @@
 import './App.css'
+import Footer from './Footer'
+import Navbar from './Navbar'
 
 function App() {
   return (
     <>
-    {/* Logo, title and description */}
-    <div class="home-view">
-      <div class="content-main">
-        <div class="logo">
-          <p class="emoji-main" alt="Trophy Emoji">🏆</p>
-        </div>
-        <div class="home-text">
-          <h1>BlockAid</h1>
-          <p>Welcome to our blockchain voting app🚀</p>
+      {/* Navigation Bar */}
+      <Navbar />
+      
+      {/* Logo, title and description */}
+      <div className="home-view">
+        <div className="content-main">
+          <div className="logo">
+            <p className="emoji-main" alt="Trophy Emoji">🏆</p>
+          </div>
+          <div className="home-text">
+            <h1>BlockAid</h1>
+            <p>Welcome to our blockchain voting app🚀</p>
+          </div>
         </div>
       </div>
-    </div>
 
-    {/* Call to action: ask users to donate */}
-    <div class="call-to-action">
-      <div class="cta-text">
-        <h2>Donate Now</h2>
-        <p>Disclaimer</p>
+      {/* Call to action: ask users to donate */}
+      <div className="call-to-action">
+        <div className="cta-text">
+          <h2>Donate Now</h2>
+          <p>Disclaimer</p>
+        </div>
+        <div className="cta-button">
+          <button>Cast my vote</button>
+        </div>
       </div>
-      <div class="cta-button">
-        <button>Cast my vote</button>
-      </div>
-    </div>
+
+      {/* Footer */}
+      <Footer />
     </>
   )
 }

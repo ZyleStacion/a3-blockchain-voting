@@ -35,18 +35,28 @@ Dynamic Contents:
 - Thinh Nguyen Huynh Trieu s3977756 
 - Zyle Estacion s4064846 
 
-## Self Deployment
+## Installation and Setup
 Please install the following dependencies:
 
-Backend:
+### Backend:
+```bash
+cd backend
+TODO
+```
 - fastapi==0.111.0
 - uvicorn==0.30.1
 - pydantic==2.8.2
 - motor==3.4.0
 - pymongo==4.6.1
 
-Frontend:
+### Frontend:
+```bash
+cd frontend
+npm install
+npm run dev
+```
 - @chakra-ui/react
 - @emotion/react
 - @emotion/styled
 - framer-motion
+- @vitejs/plugin-react
