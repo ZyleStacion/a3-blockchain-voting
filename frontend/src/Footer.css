@@ -1,8 +1,15 @@
 .footer {
   background-color: #f1f1f1;
   color: #333;
-  padding: 2rem 1rem 1rem;
-  margin-top: 3rem;
+  padding: 1rem;
+  margin-top: auto;
+  width: 100vw;
+  position: relative;
+  left: 50%;
+  right: 50%;
+  margin-left: -50vw;
+  margin-right: -50vw;
+  flex-shrink: 0;
 }
 
 .footer-content {
@@ -11,7 +18,7 @@
   align-items: flex-start;
   max-width: 1200px;
   margin: 0 auto;
-  gap: 2rem;
+  gap: 1rem;
 }
 
 .footer-section {
@@ -20,16 +27,16 @@
 
 .footer-section h3,
 .footer-section h4 {
-  margin-bottom: 1rem;
+  margin-bottom: 0.5rem;
   color: #333;
 }
 
 .footer-section h3 {
-  font-size: 1.2rem;
+  font-size: 1rem;
 }
 
 .footer-section h4 {
-  font-size: 1rem;
+  font-size: 0.9rem;
 }
 
 .footer-links {
@@ -39,13 +46,14 @@
 }
 
 .footer-links li {
-  margin-bottom: 0.5rem;
+  margin-bottom: 0.25rem;
 }
 
 .footer-links a {
   color: #666;
   text-decoration: none;
   transition: color 0.3s ease;
+  font-size: 0.85rem;
 }
 
 .footer-links a:hover {
@@ -58,14 +66,14 @@
 }
 
 .social-icon {
-  width: 40px;
-  height: 40px;
+  width: 30px;
+  height: 30px;
   background-color: #ddd;
-  border-radius: 8px;
+  border-radius: 6px;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 1.2rem;
+  font-size: 1rem;
   cursor: pointer;
   transition: background-color 0.3s ease;
 }
@@ -77,14 +85,14 @@
 
 .footer-bottom {
   text-align: center;
-  margin-top: 2rem;
-  padding-top: 1rem;
+  margin-top: 1rem;
+  padding-top: 0.5rem;
   border-top: 1px solid #ddd;
 }
 
 .footer-bottom p {
   margin: 0;
-  font-size: 0.9rem;
+  font-size: 0.75rem;
   color: #666;
 }
 
