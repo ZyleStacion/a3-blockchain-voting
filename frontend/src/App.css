@@ -10,7 +10,7 @@ html, body {
   margin: 0;
   padding: 0;
   overflow: hidden;
-  background-color: #f1f1f1f1;
+  background-color: #f1f1f1;
   color: #333;
 }
 
@@ -27,9 +27,8 @@ html, body {
   display: flex;
   justify-content: center;
   align-items: flex-start;
-  flex: 1;
   overflow: hidden;
-  padding-top: 2rem;
+  padding: 2rem;
 }
 
 .content-main { 
@@ -44,22 +43,30 @@ html, body {
 }
 
 .emoji-main{
-  display: inline-block;
+  display: flex;
+  justify-content: center;
+  align-items: center;
   height: 80px;
   width: 80px;
   font-size: 4rem;
-  text-align: center;
   margin: 0 0;
+  border: 2px solid var(--secondary-color);
+  border-radius: 12px;
 }
 
 .call-to-action {
   padding: 1rem 2rem;
   display: flex;
   justify-content: center;
-  align-items: flex-end;
+  align-items: center;
   gap: 2rem;
   max-width: 1200px;
   width: 100%;
   margin: 0 auto;
   flex-shrink: 0;
+}
+
+/* Spacer to push footer to bottom */
+.spacer {
+  flex: 1;
 }

@@ -41,6 +41,8 @@ Please install the following dependencies:
 ### Backend:
 ```bash
 cd backend
+uvicorn main
+127.0.01:8080
 TODO
 ```
 - fastapi==0.111.0

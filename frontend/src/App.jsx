@@ -32,6 +32,9 @@ function App() {
         </div>
       </div>
 
+      {/* Spacer to push footer to bottom */}
+      <div className="spacer"></div>
+
       {/* Footer */}
       <Footer />
     </>
