@@ -1,0 +1,39 @@
+{
+    "users": {
+        "user_A": {
+            "donation_balance": 0,
+            "voting_credits": 10
+        },
+        "user_B": {
+            "donation_balance": 500,
+            "voting_credits": 0
+        }
+    },
+    "proposals": {
+        "proposal_1": {
+            "name": "child support",
+            "description": "help children in need."
+        },
+        "proposal_2": {
+            "name": "environment",
+            "description": "Facilitate environment for the future."
+        }
+    },
+    "donation_pot": 1000,
+    "current_transactions": [
+        {
+            "voter": "user_A",
+            "proposal_id": "proposal_1",
+            "votes": 15,
+            "timestamp": 1757050036.1781163
+        },
+        {
+            "voter": "user_A",
+            "proposal_id": "proposal_1",
+            "votes": 15,
+            "timestamp": 1757050658.6160407
+        }
+    ],
+    "is_voting_active": true,
+    "voting_period_start_time": 1757050653.4415174
+}

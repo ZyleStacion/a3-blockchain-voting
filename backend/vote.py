@@ -1,24 +1,22 @@
-from fastapi import APIRouter, HTTPException
-from db.database import votes_collection
-from db.schemas import VoteCreate, VoteResponse
-from utils.DigitalSignature import verifying_vote
+# backend/vote.py
+from fastapi import APIRouter
+from .feature.buy_credits import buy_voting_credits, BuyCreditsRequest
+from .feature.Voting import create_vote_transaction, VoteRequest
 
-vote_router = APIRouter(prefix="/votes", tags=["Votes"])
+vote_router = APIRouter(prefix="/vote", tags=["vote"])
 
-@vote_router.post("/", response_model=VoteResponse)
-async def cast_vote(vote: VoteCreate):
-    vote_data = f"{vote.user_id}:{vote.charity_id}:{vote.tickets}"
-    is_valid = await verifying_vote(vote.user_id, vote_data, vote.signature)
-    if not is_valid:
-        raise HTTPException(status_code=400, detail="Invalid signature")
+@vote_router.post("/buy-credits")
+async def buy_credits(request_data: BuyCreditsRequest):
+    """
+    API endpoint for vote purchase
+    """
+    result = await buy_voting_credits(request_data.username, request_data.credits)
+    return result
 
-    result = await votes_collection.insert_one(vote.dict())
-    saved_vote = await votes_collection.find_one({"_id": result.inserted_id})
-
-    return {
-        "id": str(saved_vote["_id"]),
-        "user_id": saved_vote["user_id"],
-        "charity_id": saved_vote["charity_id"],
-        "tickets": saved_vote["tickets"],
-        "signature": saved_vote["signature"]
-    }
+@vote_router.post("/submit")
+async def submit_vote(request_data: VoteRequest):
+    """
+    API endpoint for voting
+    """
+    result = await create_vote_transaction(request_data.username, request_data.proposal_id, request_data.votes)
+    return result
