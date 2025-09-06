@@ -1,39 +1,26 @@
 {
-    "users": {
-        "user_A": {
-            "donation_balance": 0,
-            "voting_credits": 10
-        },
-        "user_B": {
-            "donation_balance": 500,
-            "voting_credits": 0
-        }
+  "users": {
+    "user_A": {
+      "donation_balance": 1000,
+      "voting_credits": 0
     },
-    "proposals": {
-        "proposal_1": {
-            "name": "child support",
-            "description": "help children in need."
-        },
-        "proposal_2": {
-            "name": "environment",
-            "description": "Facilitate environment for the future."
-        }
+    "user_B": {
+      "donation_balance": 500,
+      "voting_credits": 0
+    }
+  },
+  "proposals": {
+    "proposal_1": {
+      "name": "child support",
+      "description": "Help the children in need."
     },
-    "donation_pot": 1000,
-    "current_transactions": [
-        {
-            "voter": "user_A",
-            "proposal_id": "proposal_1",
-            "votes": 15,
-            "timestamp": 1757050036.1781163
-        },
-        {
-            "voter": "user_A",
-            "proposal_id": "proposal_1",
-            "votes": 15,
-            "timestamp": 1757050658.6160407
-        }
-    ],
-    "is_voting_active": true,
-    "voting_period_start_time": 1757050653.4415174
+    "proposal_2": {
+      "name": "환경 보호 단체",
+      "description": "미래 세대를 위한 환경을 가꿉니다."
+    }
+  },
+  "donation_pot": 0,
+  "current_transactions": [],
+  "is_voting_active": false,
+  "voting_period_start_time": null
 }

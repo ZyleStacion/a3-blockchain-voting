@@ -1,4 +1,3 @@
-# backend/feature/buy_credits.py
 from pydantic import BaseModel
 from typing import Dict, Any
 from ..db.database import load_data, save_data
@@ -13,9 +12,12 @@ def calculate_qv_cost(credits: int) -> int:
 
 async def buy_voting_credits(username: str, credits_to_buy: int) -> Dict[str, Any]:
     data = load_data()
-    
+
     if not data:
-        return {"success": False, "message": "Cannot call data."}
+        return {"success": False, "message": "Cannot load data file."}
+    
+    if data.get("is_voting_active"):
+        return {"success": False, "message": "You cannot purchase tickets while voting is in session."}
 
     user = data['users'].get(username)
     if not user:
@@ -35,4 +37,4 @@ async def buy_voting_credits(username: str, credits_to_buy: int) -> Dict[str, An
     if data['donation_pot'] >= THRESHOLD_AMOUNT and not data.get("is_voting_active"):
         start_new_voting_period()
 
-    return {"success": True, "message": f"'{username}'님이 {credits_to_buy} 투표권을 {cost} $로 구매했습니다.", "new_balance": user['voting_credits']}
+    return {"success": True, "message": f"'{username}'has purchased {credits_to_buy} tickets with {cost} $.", "new_balance": user['voting_credits']}

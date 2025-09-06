@@ -1,15 +1,12 @@
-# backend/feature/Voting.py
 from pydantic import BaseModel
 from typing import Dict, Any, List
 from ..db.database import load_data, save_data, load_chain_data, save_chain_data
-
 import json
-import os
 import time
 import hashlib
 
 THRESHOLD_AMOUNT = 1000
-VOTING_PERIOD_SECONDS = 300 # 5 minutes for testing, can be other values later
+VOTING_PERIOD_SECONDS = 300
 
 class VoteRequest(BaseModel):
     username: str
@@ -17,22 +14,20 @@ class VoteRequest(BaseModel):
     votes: int
 
 def calculate_hash(data_dict: Dict[str, Any]) -> str:
-    """Calculates the hash of a dictionary."""
     block_string = json.dumps(data_dict, sort_keys=True).encode()
     return hashlib.sha256(block_string).hexdigest()
 
 async def create_vote_transaction(username: str, proposal_id: str, votes: int) -> Dict[str, Any]:
-    """Creates a vote transaction and adds it to the current transactions list."""
     data = load_data()
     if not data:
-        return {"success": False, "message": "Cannot call data file."}
+        return {"success": False, "message": "Cannot load data file."}
     
     if not data.get("is_voting_active"):
-        return {"success": False, "message": "Vote is not in session."}
+        return {"success": False, "message": "Not in voting session."}
 
     user = data['users'].get(username)
     if not user:
-        return {"success": False, "message": "Cannot find user."}
+        return {"success": False, "message": "User cannot be found."}
 
     if user['voting_credits'] < votes:
         return {"success": False, "message": "Not enough tickets."}
@@ -49,19 +44,17 @@ async def create_vote_transaction(username: str, proposal_id: str, votes: int) -
     data['current_transactions'].append(transaction)
     save_data(data)
 
-    return {"success": True, "message": f"'{username}'has voted {votes} tickets to '{proposal_id}'."}
+    return {"success": True, "message": f"'{username}' has voted {votes} tickets to '{proposal_id}'."}
 
 def start_new_voting_period():
-    """Starts a new voting period after the donation pot is full."""
     data = load_data()
     if data and not data.get("is_voting_active"):
         data["is_voting_active"] = True
         data["voting_period_start_time"] = time.time()
         save_data(data)
-        print("Pot is full. The pot overflows to generate a vote session.")
+        print("Pot has reached overflow threshold. Initiating vote.")
 
 async def finalize_voting():
-    """Finalizes voting, creates a new block, and saves it to the blockchain file."""
     data = load_data()
     chain = load_chain_data()
 
@@ -90,7 +83,7 @@ async def finalize_voting():
         winner = max(vote_counts, key=vote_counts.get)
         donation_amount = data['donation_pot']
         
-        print(f"\n[Result] Winner is '{winner}'. A total of {donation_amount}$ will be donated.")
+        print(f"\n[Result] The winner of the vote is '{winner}'. A total of {donation_amount}$ will be donated.")
         
         data['donation_pot'] = 0
     
@@ -98,10 +91,9 @@ async def finalize_voting():
     data['is_voting_active'] = False
     data['voting_period_start_time'] = None
     save_data(data)
-    print("Voting is concluded and blocks were generated.")
+    print("Votes were concluded and blocks were created.")
 
 async def check_and_finalize_voting_job():
-    """A scheduled job to check if the voting period has ended."""
     data = load_data()
     if data and data.get("is_voting_active") and data.get("voting_period_start_time"):
         elapsed_time = time.time() - data.get("voting_period_start_time")
