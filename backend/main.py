@@ -1,10 +1,10 @@
 # backend/main.py
 from fastapi import FastAPI, APIRouter
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
-from .feature.buy_credits import buy_voting_credits, BuyCreditsRequest
-from .feature.Voting import create_vote_transaction, VoteRequest, check_and_finalize_voting_job
-from .vote import vote_router
-from .db.database import load_data, save_data
+# from .feature.buy_credits import buy_voting_credits, BuyCreditsRequest
+from feature.Voting import check_and_finalize_voting_job
+from vote import vote_router
+from db.database import load_data, save_data
 
 # Set up
 app = FastAPI()
@@ -14,7 +14,7 @@ app.include_router(router)
 # Scheduler setup
 scheduler = AsyncIOScheduler()
 scheduler.start()
-
+ 
 # Schedule the job to check for voting finalization every minute
 scheduler.add_job(check_and_finalize_voting_job, 'interval', seconds=60)
 

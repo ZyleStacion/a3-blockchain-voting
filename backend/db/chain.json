@@ -1,1 +1,22 @@
-[]
+[
+    {
+        "index": 0,
+        "timestamp": 1757164495.661371,
+        "transactions": [
+            {
+                "voter": "user_A",
+                "proposal_id": "proposal_1",
+                "votes": 15,
+                "timestamp": 1757050036.1781163
+            },
+            {
+                "voter": "user_A",
+                "proposal_id": "proposal_1",
+                "votes": 15,
+                "timestamp": 1757050658.6160407
+            }
+        ],
+        "prev_hash": "0",
+        "hash": "947d191a8f22eee2129844cb4b7269d9464d74ad5750c387bd2968205aff2753"
+    }
+]

@@ -19,21 +19,8 @@
             "description": "Facilitate environment for the future."
         }
     },
-    "donation_pot": 1000,
-    "current_transactions": [
-        {
-            "voter": "user_A",
-            "proposal_id": "proposal_1",
-            "votes": 15,
-            "timestamp": 1757050036.1781163
-        },
-        {
-            "voter": "user_A",
-            "proposal_id": "proposal_1",
-            "votes": 15,
-            "timestamp": 1757050658.6160407
-        }
-    ],
-    "is_voting_active": true,
-    "voting_period_start_time": 1757050653.4415174
+    "donation_pot": 0,
+    "current_transactions": [],
+    "is_voting_active": false,
+    "voting_period_start_time": null
 }

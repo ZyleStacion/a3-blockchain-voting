@@ -1,8 +1,8 @@
 # backend/feature/buy_credits.py
 from pydantic import BaseModel
 from typing import Dict, Any
-from ..db.database import load_data, save_data
-from .Voting import start_new_voting_period, THRESHOLD_AMOUNT
+from db.database import load_data, save_data
+from feature.Voting import start_new_voting_period, THRESHOLD_AMOUNT
 
 class BuyCreditsRequest(BaseModel):
     username: str
