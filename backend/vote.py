@@ -1,5 +1,4 @@
 # backend/vote.py
-
 from fastapi import APIRouter
 from feature.buy_credits import buy_voting_credits, BuyCreditsRequest
 from feature.Voting import create_vote_transaction, VoteRequest

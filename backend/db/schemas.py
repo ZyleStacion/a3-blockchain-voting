@@ -14,8 +14,9 @@ class UserLogin(BaseModel):
 class UserResponse(BaseModel):
     id: str
     username: str
-    public_key: Optional[str] = None   # for blockchain later
-
+    email: str   # <-- add this
+    public_key: str
+    
     class Config:
         orm_mode = True
 

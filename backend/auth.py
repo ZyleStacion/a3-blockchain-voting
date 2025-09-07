@@ -37,12 +37,15 @@ async def signup(user: UserCreate):
 
 @router.post("/login", response_model=UserResponse)
 async def login(user: UserLogin):
-    db_user = await users_collection.find_one({"email": user.email})
-    if not db_user or db_user["password"] != user.password:
+    db_user = await users_collection.find_one({"username": user.username})
+    if not db_user:
         raise HTTPException(status_code=401, detail="Invalid credentials")
-    return user_helper(db_user)
+
+    if db_user["password"] != user.password:
+        raise HTTPException(status_code=401, detail="Invalid credentials")
+
+    return user_helper(db_user) 
 
 @router.post("/logout")
 async def logout():
-    # With JWT sessions, you'd blacklist the token here.
     return {"message": "Logged out successfully"}

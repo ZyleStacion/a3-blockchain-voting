@@ -1,6 +1,6 @@
 from pydantic import BaseModel
 from typing import Dict, Any, List
-from ..db.database import load_data, save_data, load_chain_data, save_chain_data
+from db.save import load_data, save_data, load_chain_data, save_chain_data
 import json
 import time
 import hashlib
