@@ -8,7 +8,6 @@ app = FastAPI()
 router = APIRouter()
 app.include_router(router)
 
-
 @router.get("/")
 def test_endpoint():
     return {"message": "Welcome to the Blockchain Voting API"}
