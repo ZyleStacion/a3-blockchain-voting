@@ -1,0 +1,26 @@
+{
+    "users": {
+        "user_A": {
+            "donation_balance": 100,
+            "voting_credits": 30
+        },
+        "user_B": {
+            "donation_balance": 500,
+            "voting_credits": 0
+        }
+    },
+    "proposals": {
+        "proposal_1": {
+            "name": "child support",
+            "description": "Help the children in need."
+        },
+        "proposal_2": {
+            "name": "Environment protection",
+            "description": "Facilitate environment for the future."
+        }
+    },
+    "donation_pot": 900,
+    "current_transactions": [],
+    "is_voting_active": false,
+    "voting_period_start_time": null
+}
