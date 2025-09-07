@@ -33,3 +33,17 @@ class VoteResponse(BaseModel):
     signature: Optional[str] = None
     
 # Transaction schema
+class TransactionCreate(BaseModel):
+    from_address: str
+    to_address: str
+    amount: float
+    
+class TransactionResponse(BaseModel):
+    id: str
+    from_address: str
+    to_address: str
+    amount: float
+    timestamp: str  # ISO format
+    
+    class Config:
+        orm_mode = True

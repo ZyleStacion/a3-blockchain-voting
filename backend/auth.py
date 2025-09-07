@@ -19,7 +19,6 @@ def transaction_help(transaction) -> dict:
     pass
 
 
-
 @router.post("/signup", response_model=UserResponse)
 async def signup(user: UserCreate):
     existing = await users_collection.find_one({"email": user.email})
