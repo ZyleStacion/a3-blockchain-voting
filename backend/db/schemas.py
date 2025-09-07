@@ -47,3 +47,20 @@ class TransactionResponse(BaseModel):
     
     class Config:
         orm_mode = True
+        
+        
+#Ticket schema
+class TicketCreate(BaseModel):
+    user_id: str
+    voting_credits: int
+    donation_balance: float
+    
+class TicketResponse(BaseModel):
+    id: str
+    user_id: str
+    voting_credits: int
+    donation_balance: float
+    
+    class Config:
+        orm_mode = True
+        
