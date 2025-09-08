@@ -1,10 +1,11 @@
 # backend/vote.py
 from fastapi import APIRouter
 from feature.buy_credits import buy_voting_credits
-from feature.Voting import create_vote_transaction
+from feature.Voting import create_vote_transaction, start_new_voting_period
 from db.schemas import CreditPurchaseResponse, VoteProposalCreate, VoteSubmit
 
 vote_router = APIRouter(prefix="/vote", tags=["Vote"])
+start_new_voting_period()
 
 @vote_router.post("/buy-credits", response_model=CreditPurchaseResponse)
 def buy_credits_endpoint(request: CreditPurchaseResponse):

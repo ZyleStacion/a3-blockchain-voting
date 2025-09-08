@@ -1,0 +1,104 @@
+[
+    {
+        "index": 0,
+        "timestamp": "2025-09-08 13:28:36.534871",
+        "data": "Genesis Block",
+        "transactions": [
+            {
+                "id": "tx000",
+                "sender": "ADMIN",
+                "receiver": "Alice",
+                "amount": 1000
+            },
+            {
+                "id": "tx0001",
+                "sender": "ADMIN",
+                "receiver": "Jeff",
+                "amount": 1000
+            },
+            {
+                "id": "tx0002",
+                "sender": "ADMIN",
+                "receiver": "Carl",
+                "amount": 1000
+            },
+            {
+                "id": "tx0003",
+                "sender": "ADMIN",
+                "receiver": "Edward",
+                "amount": 1000
+            },
+            {
+                "id": "tx0004",
+                "sender": "ADMIN",
+                "receiver": "Kate",
+                "amount": 1000
+            },
+            {
+                "id": "tx0005",
+                "sender": "ADMIN",
+                "receiver": "Joe",
+                "amount": 1000
+            },
+            {
+                "id": "tx0006",
+                "sender": "ADMIN",
+                "receiver": "John",
+                "amount": 1000
+            }
+        ],
+        "proof": 1,
+        "previous_hash": "0",
+        "difficulty": 3,
+        "none": 1,
+        "hash": "d9f9f1df5969f5ed3446070ad51b6c6ad2ebcc8e8a4bcb4901e018d448f349fe"
+    },
+    {
+        "index": 1,
+        "timestamp": "2025-09-08 13:28:57.061002",
+        "data": "Vote Block",
+        "transactions": [
+            {
+                "id": "vote_8812a57798",
+                "sender": "user_A",
+                "receiver": "3",
+                "amount": 1
+            },
+            {
+                "id": "reward_2",
+                "sender": "SYSTEM",
+                "receiver": "SYSTEM",
+                "amount": 10
+            }
+        ],
+        "proof": 3065,
+        "previous_hash": "a99290323ba5e5c8801b91c53488c4798c6fdf6c26ef62268920fc52a0f38eba",
+        "difficulty": 3,
+        "none": 3065,
+        "hash": "25436e35e73631e0f4c3befa5f72e56ff7a196a00fee7f66d99cb71e9cd2871a"
+    },
+    {
+        "index": 2,
+        "timestamp": "2025-09-08 13:29:36.840708",
+        "data": "Vote Block",
+        "transactions": [
+            {
+                "id": "vote_b05d89b866",
+                "sender": "user_B",
+                "receiver": "4",
+                "amount": 4
+            },
+            {
+                "id": "reward_3",
+                "sender": "SYSTEM",
+                "receiver": "SYSTEM",
+                "amount": 10
+            }
+        ],
+        "proof": 1206,
+        "previous_hash": "25436e35e73631e0f4c3befa5f72e56ff7a196a00fee7f66d99cb71e9cd2871a",
+        "difficulty": 3,
+        "none": 1206,
+        "hash": "2b870f4e7d4d92857f7e6a48f2b68cbb931ae9f2d1185bace045245cdc32c9b9"
+    }
+]

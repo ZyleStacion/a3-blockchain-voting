@@ -1,7 +1,6 @@
 import datetime
 import uuid
 from db.schemas import CreditPurchase, CreditPurchaseResponse
-from typing import Dict, Any
 from db.save import load_data, save_data
 from feature.Voting import start_new_voting_period, THRESHOLD_AMOUNT
 

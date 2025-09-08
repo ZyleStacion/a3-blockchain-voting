@@ -2,11 +2,11 @@
     "users": {
         "user_A": {
             "donation_balance": 96,
-            "voting_credits": 34
+            "voting_credits": 17
         },
         "user_B": {
             "donation_balance": 500,
-            "voting_credits": 0
+            "voting_credits": 36
         }
     },
     "proposals": {
@@ -21,6 +21,6 @@
     },
     "donation_pot": 904,
     "current_transactions": [],
-    "is_voting_active": false,
-    "voting_period_start_time": null
+    "is_voting_active": true,
+    "voting_period_start_time": 1757313243.2491782
 }

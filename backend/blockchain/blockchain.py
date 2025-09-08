@@ -135,12 +135,8 @@ class Blockchain:
             to_digest = self.to_digest(new_proof, previous_proof, index, data)
             hash_value = hashlib.sha256(to_digest).hexdigest()
 
-            # Show every nonce attempt
-            print(f"Nonce: {new_proof} -> Hash: {hash_value}") # Print all the nonce value till it finds correct nonce
-
             # Stop if hash meets difficulty requirement
             if hash_value.startswith("0" * self.difficulty):
-                print(f"Valid nonce found: {new_proof} with hash {hash_value}")
                 return new_proof
             
             # Increment nonce
@@ -155,10 +151,7 @@ class Blockchain:
         elif self.difficulty > 1 and len(self.chain) & 7 == 0:
             self.difficulty -= 1
             
-        if self.difficulty != old_difficulty:
-            print(f"Difficulty adjusted: {old_difficulty} -> {self.difficulty}")
-        else:
-            print(f"Difficulty remains at: {self.difficulty}")
+      
     
     # Hash value
     def hash_value(self, block):
@@ -198,7 +191,6 @@ class Blockchain:
           the block.
           
         """
-        print(f"Current difficulty {self.difficulty}...")
         
         #Get previous block
         previous_block = self.get_previous_block()
@@ -231,7 +223,6 @@ class Blockchain:
         # Adjust difficulty
         self.difficulty_adjustment()
 
-        print(f"Block mined at difficulty {self.difficulty}. Nonce: {proof}, Hash: {block['hash']}")
         return block
     
     # Create block
