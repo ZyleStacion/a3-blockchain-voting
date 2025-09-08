@@ -164,12 +164,15 @@ class Blockchain:
         Returns:
             _type_:  The SHA-256 value of the hashed blocked
         """
-        block_copy = dict(block)
-        block_copy.pop("hash", None)
+        def convert_bytes(obj):
+            if isinstance(obj, bytes):
+                return obj.decode()  # Convert b'text' -> 'text'
+            raise TypeError(f"Object of type {obj.__class__.__name__} is not JSON serializable")
 
-        encoded_block = json.dumps(block_copy, sort_keys=True).encode()
+        block_copy = dict(block)
+        encoded_block = json.dumps(block_copy, sort_keys=True, default=convert_bytes).encode()
         return hashlib.sha256(encoded_block).hexdigest()
-              
+                
     # ---- Block ----
     def mine_block(self, data: str, miner: str) -> dict: 
         """
@@ -304,11 +307,14 @@ class Blockchain:
     # ---- DATA PERSISTENCE ----
     # Save Blockchain
     def save_chain(self):
-        """
-        Save chain in a form of json file when newly blocks has been added into the chain.
-        """
+        def convert_bytes(obj):
+            if isinstance(obj, bytes):
+                return obj.decode()  # or use base64 if it's binary content
+            raise TypeError(f"Object of type {obj.__class__.__name__} is not JSON serializable")
+
         with open("blockchain.json", "w") as f:
-            json.dump(self.chain, f , indent=4)
+            json.dump(self.chain, f, indent=4, default=convert_bytes)
+
 
     # Load block chain
     def load_chain(self):

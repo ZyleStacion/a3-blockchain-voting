@@ -1,6 +1,7 @@
 from typing import Dict, Any, List
 import uuid
 from db.save import load_data, save_data, load_chain_data, save_chain_data
+from db.database import proposals_collection, users_collection
 from blockchain.blockchain import Blockchain, Transactions
 import json
 import time
@@ -18,61 +19,75 @@ def calculate_hash(data_dict: Dict[str, Any]) -> str:
     return hashlib.sha256(block_string).hexdigest()
 
 
-def create_vote_transaction(username: str, proposal_id: str, votes: int) -> Dict[str, Any]:
-    data = load_data()
-    if not data:
-        return {"success": False, "message": "Cannot load data file."}
-    
-    if not data.get("is_voting_active"):
-        return {"success": False, "message": "Not in voting session."}
-
-    user = data['users'].get(username)
+async def create_vote_transaction(user_id: int, proposal_id: int, votes: Dict[str, int]):
+    # 1. Check if user exists
+    user = await users_collection.find_one({"user_id": user_id})
     if not user:
-        return {"success": False, "message": "User cannot be found."}
+        return {"success": False, "message": f"User ID {user_id} not found."}
 
-    if user['voting_credits'] < votes:
-        return {"success": False, "message": "Not enough tickets."}
-        
-    # Deduct credits locally
-    user['voting_credits'] -= votes
-    save_data(data)
+    # 2. Check if proposal exists
+    proposal = await proposals_collection.find_one({"proposal_id": proposal_id})
+    if not proposal:
+        return {"success": False, "message": f"Proposal ID {proposal_id} not found."}
 
-    # Create unique transaction ID
+   # Step 3: Validate vote options (case-insensitive) and map back to stored options
+    valid_options = proposal["options"]
+    option_map = {opt.lower(): opt for opt in valid_options}
+
+    update_fields = {}
+
+    for opt, count in votes.items():
+        lower_opt = opt.lower()
+
+    if lower_opt not in option_map:
+        return {
+            "success": False,
+            "message": f"Invalid voting option: {opt}. Valid options: {valid_options}"
+        }
+
+    # Use correct casing for MongoDB field update
+    correct_case_opt = option_map[lower_opt]
+    update_fields[f"votes.{correct_case_opt}"] = count
+
+
+    # 4. Create unique transaction ID
     tx_id = f"vote_{uuid.uuid4().hex[:10]}"
 
-    # Use wallet address (or username if none exists) as pseudonymous identity
-    voter_pubkey = user.get("wallet_address", username)
+    # 5. Use public_key or user_id
+    voter_id = user.get("public_key", str(user_id))
 
-    # Build blockchain transaction (votes are treated as tokens spent on proposal)
+    # 6. Blockchain transaction (optional step: store individual votes)
+    total_votes = sum(votes.values())
+
     tx = Transactions(
         transaction_id=tx_id,
-        sender=voter_pubkey,
-        receiver=proposal_id,
-        amount=votes
+        sender=voter_id,
+        receiver=str(proposal_id),
+        amount=total_votes
     )
 
-    # Insert into blockchain — bypass validation for vote_* tx
-    if tx_id.startswith("vote_"):
-        blockchain.pending_transactions.append(tx.to_dict())
-        success = True
-    else:
-        success = blockchain.insert_transaction(tx)
-
+    success = blockchain.insert_transaction(tx)
     if not success:
         return {"success": False, "message": "Failed to insert vote transaction."}
 
-    # Mine the block immediately (or batch later)
-    block = blockchain.mine_block(data="Vote Block", miner="SYSTEM")
-
-    # Save blockchain state
+    # 7. Mine immediately
+    block = blockchain.mine_block(data="Vote", miner="SYSTEM")
     blockchain.save_chain()
+
+    # 8. Update vote counts in MongoDB
+    update_fields = {f"votes.{opt}": count for opt, count in votes.items()}
+    await proposals_collection.update_one(
+        {"proposal_id": proposal_id},
+        {"$inc": update_fields}
+    )
 
     return {
         "success": True,
-        "message": f"Vote recorded on-chain: {voter_pubkey} voted {votes} on proposal {proposal_id}",
+        "message": f"Vote recorded successfully.",
         "tx_id": tx_id,
         "block_index": block["index"],
-        "block_hash": block["hash"]
+        "proposal_id": proposal_id,
+        "voter": voter_id
     }
 
 def start_new_voting_period():

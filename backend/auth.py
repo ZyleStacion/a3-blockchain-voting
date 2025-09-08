@@ -1,5 +1,5 @@
 from fastapi import APIRouter, HTTPException, Depends
-from db.database import users_collection
+from db.database import users_collection, get_next_user_id
 from db.schemas import UserCreate, UserLogin, UserResponse
 from bson import ObjectId
 from utils.DigitalSignature import generate_key
@@ -9,7 +9,7 @@ router = APIRouter(prefix="/auth", tags=["Authentication"])
 # Utility: Convert Mongo doc to dict
 def user_helper(user) -> dict:
     return {
-        "id": str(user["_id"]),
+        "id": user["user_id"],
         "username": user["username"],
         "email": user["email"],
         "public_key": user.get("public_key", None)
@@ -27,9 +27,13 @@ async def signup(user: UserCreate):
 
     private_key, public_key = generate_key()
 
+    # 🔢 Get a human-readable user ID
+    user_id = await get_next_user_id()
+
     user_doc = user.dict()
+    user_doc["user_id"] = user_id
     user_doc["public_key"] = public_key
-    
+
     result = await users_collection.insert_one(user_doc)
     new_user = await users_collection.find_one({"_id": result.inserted_id})
     return user_helper(new_user)

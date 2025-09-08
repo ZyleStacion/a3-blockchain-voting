@@ -1,5 +1,5 @@
 from pydantic import BaseModel, Field
-from typing import Optional
+from typing import Dict, Optional
 
 # User schemas 
 class UserCreate(BaseModel):
@@ -12,7 +12,7 @@ class UserLogin(BaseModel):
     password: str
 
 class UserResponse(BaseModel):
-    id: str
+    id: int
     username: str
     email: str   # <-- add this
     public_key: str
@@ -77,24 +77,35 @@ class CreditPurchaseResponse(BaseModel):
         
 # Vote proposal schema
 class VoteProposalCreate(BaseModel):    
-    title: str
-    description: str    
-    options: list[str]  # e.g. ["yes", "no", "abstain"]
+        title: str
+        description: str    
+        options: list[str]  # e.g. ["yes", "no", "abstain"]
 
     
 class VoteProposalResponse(BaseModel):
-    id: str
+    id: int
     title: str
     description: str
     options: list[str]
 
 class VoteSubmit(BaseModel):
-    user_id: str         
-    proposal_id: str
-    votes: int
+    user_id: int         
+    proposal_id: int
+    votes: Dict[str, int]  # e.g., {"yes": 1}
     
     class Config:
-        orm_mode = True
+        schema_extra = {
+            "example": {
+                "user_id": "1",
+                "proposal_id": "1",
+                "votes": {
+                    "Yes": 0,
+                    "No": 0,
+                    "Abstain": 0
+                }
+
+            }
+        }
         
 #Donation schema
 class DonationCreate(BaseModel):

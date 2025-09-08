@@ -1,7 +1,7 @@
 [
     {
         "index": 0,
-        "timestamp": "2025-09-08 18:41:31.461201",
+        "timestamp": "2025-09-08 21:49:05.452405",
         "data": "Genesis Block",
         "transactions": [
             {
@@ -16,18 +16,18 @@
         "previous_hash": "0",
         "difficulty": 3,
         "none": 1,
-        "hash": "f9127eba9dbd3e9585681f442c18d56a0af073b7f67d436044e5642fbdd104d7"
+        "hash": "e97e5ed944525b0cd317c54e2836d61a7bd982ee5d9199840ca4681f4bb068c2"
     },
     {
         "index": 1,
-        "timestamp": "2025-09-08 18:42:30.519339",
-        "data": "donation",
+        "timestamp": "2025-09-08 21:49:23.264246",
+        "data": "Vote",
         "transactions": [
             {
-                "id": "dff350df-17ec-41c3-a3ce-2db0f3922b67",
-                "sender": "user_A",
-                "receiver": "DAO_POOL",
-                "amount": 20.0
+                "id": "vote_ac5a8be27d",
+                "sender": "-----BEGIN PUBLIC KEY-----\nMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA0au/Hp2uxExPVKWrRwYs\nMjRqxbBUkg6G2NXsMORQQP1eV9CY0qKKqftDxOlZ3jdQ99a5IGnqGKeJ2/U5jmsB\nwhMIWK7jTWCE72snfLMmXdyr2akTIvswrb0laopxRVyjZDIQonDtoCq8krXb7Mp/\n7RvkuFk/sc8ygEPox947ONYAeKGp0tY14IT2EP3P6DTCjHetA+Ce5BVpBaUFSrvm\nEOML5gzamn/oWaBll/DjPirNAuT3sHsbcuBq0Rp5G/I2BAxm6FwyiVoWrKTqDigC\nRvk2CU1c3xMB360iV0stnPSG5EyVZz2kkP/4nipfNzvNS3D+NPx0+vE2MprqgTHP\nCwIDAQAB\n-----END PUBLIC KEY-----\n",
+                "receiver": "2",
+                "amount": 0
             },
             {
                 "id": "reward_2",
@@ -36,10 +36,10 @@
                 "amount": 10
             }
         ],
-        "proof": 4523,
-        "previous_hash": "ccafece2e559dca5d54e2318dc5bc8907953be76c27274ba9e9dc84cfbb9940a",
+        "proof": 7759,
+        "previous_hash": "8c168ed107f1c2b7e22894ed44147d423b41651092149f6d595233c03cff603d",
         "difficulty": 3,
-        "none": 4523,
-        "hash": "d5009a6396b28a97e161a5c4a76c15dd902568dce45edc458227b56faf21fc89"
+        "none": 7759,
+        "hash": "a077778561536340dc17aadf07f4cc44687703dfba6cc198dad53944b3aeb972"
     }
 ]
