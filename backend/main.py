@@ -6,7 +6,6 @@ from feature.voting import check_and_finalize_voting_job
 from vote import vote_router  
 from auth import router as auth_router
 from block  import router as block_router
-from donate import donate_router  
 
 
 # Set up
@@ -26,9 +25,6 @@ scheduler.add_job(check_and_finalize_voting_job, 'interval', seconds=60)
 # Include routers
 app.include_router(auth_router)
 app.include_router(vote_router)
-app.include_router(donate_router)  
-
-
 app.include_router(block_router)
 
 # Status endpoint

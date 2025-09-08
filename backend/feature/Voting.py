@@ -9,6 +9,7 @@ import hashlib
 THRESHOLD_AMOUNT = 1000
 VOTING_PERIOD_SECONDS = 300
 
+
 # Initialize global blockchain instance
 blockchain = Blockchain()
 

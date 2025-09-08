@@ -1,0 +1,45 @@
+[
+    {
+        "index": 0,
+        "timestamp": "2025-09-08 18:41:31.461201",
+        "data": "Genesis Block",
+        "transactions": [
+            {
+                "id": "genesis_tx_0",
+                "sender": "SYSTEM",
+                "receiver": "DAO_POOL",
+                "amount": 0,
+                "description": "Genesis block for DAO voting and donation system"
+            }
+        ],
+        "proof": 1,
+        "previous_hash": "0",
+        "difficulty": 3,
+        "none": 1,
+        "hash": "f9127eba9dbd3e9585681f442c18d56a0af073b7f67d436044e5642fbdd104d7"
+    },
+    {
+        "index": 1,
+        "timestamp": "2025-09-08 18:42:30.519339",
+        "data": "donation",
+        "transactions": [
+            {
+                "id": "dff350df-17ec-41c3-a3ce-2db0f3922b67",
+                "sender": "user_A",
+                "receiver": "DAO_POOL",
+                "amount": 20.0
+            },
+            {
+                "id": "reward_2",
+                "sender": "SYSTEM",
+                "receiver": "SYSTEM",
+                "amount": 10
+            }
+        ],
+        "proof": 4523,
+        "previous_hash": "ccafece2e559dca5d54e2318dc5bc8907953be76c27274ba9e9dc84cfbb9940a",
+        "difficulty": 3,
+        "none": 4523,
+        "hash": "d5009a6396b28a97e161a5c4a76c15dd902568dce45edc458227b56faf21fc89"
+    }
+]
