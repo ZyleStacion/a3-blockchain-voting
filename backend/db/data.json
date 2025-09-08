@@ -21,6 +21,6 @@
     },
     "donation_pot": 904,
     "current_transactions": [],
-    "is_voting_active": true,
-    "voting_period_start_time": 1757332354.6989138
+    "is_voting_active": false,
+    "voting_period_start_time": null
 }
