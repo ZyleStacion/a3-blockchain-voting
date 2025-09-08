@@ -442,9 +442,10 @@ class Blockchain:
         if amount < 0:
             return False
 
-        if sender != "SYSTEM":  # Allow mining rewards or system tx
+        if sender != "SYSTEM" and receiver != "DAO_POOL":
             balance = self.get_balance(sender)
             if amount > balance:
                 return False
+
 
         return True

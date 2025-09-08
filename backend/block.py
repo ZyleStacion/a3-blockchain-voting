@@ -1,11 +1,8 @@
 from fastapi import APIRouter, Form, HTTPException
-from fastapi.responses import HTMLResponse
 from pydantic import BaseModel
 from fastapi.middleware.cors import CORSMiddleware
-
-from blockchain.blockchain import Blockchain, Transactions
-
-blockchain = Blockchain()
+from blockchain.blockchain import  Transactions
+from blockchain.blockchain_singleton import blockchain  
 
 # Router setup
 router = APIRouter(prefix="/blockchain", tags=["Blockchain"])
@@ -99,26 +96,3 @@ def get_balance(user: str):
     balance = blockchain.get_balance(user)
     return {"user": user, "balance": balance}
 
-
-# --- Data persistence ---
-
-# Save chain
-@router.post("/save")
-def save_chain():
-    try:
-        blockchain.save_chain()
-        return {"saved": True, "index": len(blockchain.chain)}
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
-
-
-# Load chain
-@router.post("/load")
-def load_chain():
-    try:
-        blockchain.load_chain()
-        return {"loaded": True, "index": len(blockchain.chain)}
-    except FileNotFoundError:
-        raise HTTPException(status_code=404, detail="Blockchain file not found")
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))

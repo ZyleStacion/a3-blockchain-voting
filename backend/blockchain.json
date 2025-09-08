@@ -1,7 +1,7 @@
 [
     {
         "index": 0,
-        "timestamp": "2025-09-08 13:28:36.534871",
+        "timestamp": "2025-09-08 15:35:00.686390",
         "data": "Genesis Block",
         "transactions": [
             {
@@ -51,18 +51,18 @@
         "previous_hash": "0",
         "difficulty": 3,
         "none": 1,
-        "hash": "d9f9f1df5969f5ed3446070ad51b6c6ad2ebcc8e8a4bcb4901e018d448f349fe"
+        "hash": "9334a19f56c346847e0da8b05e98b19edaf5f6c50509d46f366a6c93cf9fe135"
     },
     {
         "index": 1,
-        "timestamp": "2025-09-08 13:28:57.061002",
-        "data": "Vote Block",
+        "timestamp": "2025-09-08 15:35:09.121631",
+        "data": "donation",
         "transactions": [
             {
-                "id": "vote_8812a57798",
-                "sender": "user_A",
-                "receiver": "3",
-                "amount": 1
+                "id": "98ac24a4-1af5-47b9-89d2-38e17a9078a2",
+                "sender": "A",
+                "receiver": "DAO_POOL",
+                "amount": 5.0
             },
             {
                 "id": "reward_2",
@@ -71,34 +71,10 @@
                 "amount": 10
             }
         ],
-        "proof": 3065,
-        "previous_hash": "a99290323ba5e5c8801b91c53488c4798c6fdf6c26ef62268920fc52a0f38eba",
+        "proof": 4523,
+        "previous_hash": "c2d384311b604d2c9f054664d207aee4529d94fb95f0b50da8e69ce965177692",
         "difficulty": 3,
-        "none": 3065,
-        "hash": "25436e35e73631e0f4c3befa5f72e56ff7a196a00fee7f66d99cb71e9cd2871a"
-    },
-    {
-        "index": 2,
-        "timestamp": "2025-09-08 13:29:36.840708",
-        "data": "Vote Block",
-        "transactions": [
-            {
-                "id": "vote_b05d89b866",
-                "sender": "user_B",
-                "receiver": "4",
-                "amount": 4
-            },
-            {
-                "id": "reward_3",
-                "sender": "SYSTEM",
-                "receiver": "SYSTEM",
-                "amount": 10
-            }
-        ],
-        "proof": 1206,
-        "previous_hash": "25436e35e73631e0f4c3befa5f72e56ff7a196a00fee7f66d99cb71e9cd2871a",
-        "difficulty": 3,
-        "none": 1206,
-        "hash": "2b870f4e7d4d92857f7e6a48f2b68cbb931ae9f2d1185bace045245cdc32c9b9"
+        "none": 4523,
+        "hash": "b17a3e467ba56d6bfb16abe924e5f97102c6e0d4f276f7d6ed6bcb7254e74b4e"
     }
 ]
