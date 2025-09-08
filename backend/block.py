@@ -5,7 +5,6 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from blockchain.blockchain import Blockchain, Transactions
 
-# ✅ Create a singleton blockchain instance
 blockchain = Blockchain()
 
 # Router setup

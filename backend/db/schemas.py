@@ -50,16 +50,13 @@ class TransactionResponse(BaseModel):
         
         
 #Ticket schema
-class TicketCreate(BaseModel):
+class TicketPurchase(BaseModel):
     user_id: str
-    voting_credits: int
-    donation_balance: float
+    ticket_purchase: int
     
 class TicketResponse(BaseModel):
-    id: str
     user_id: str
-    voting_credits: int
-    donation_balance: float
+    ticket_purchase: int
     
     class Config:
         orm_mode = True
