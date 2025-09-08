@@ -1,35 +1,35 @@
-from pydantic import BaseModel
+import datetime
+import uuid
+from db.schemas import CreditPurchase, CreditPurchaseResponse
 from typing import Dict, Any
 from db.save import load_data, save_data
 from feature.Voting import start_new_voting_period, THRESHOLD_AMOUNT
 
-class BuyCreditsRequest(BaseModel):
-    username: str
-    credits: int
-
 def calculate_qv_cost(credits: int) -> int:
     return credits ** 2
 
-async def buy_voting_credits(username: str, credits_to_buy: int) -> Dict[str, Any]:
+
+def buy_voting_credits(purchase: CreditPurchase) -> CreditPurchaseResponse:
     data = load_data()
 
     if not data:
-        return {"success": False, "message": "Cannot load data file."}
+        raise ValueError("Cannot load data file.")
     
     if data.get("is_voting_active"):
-        return {"success": False, "message": "You cannot purchase tickets while voting is in session."}
+        raise ValueError("You cannot purchase tickets while voting is in session.")
 
-    user = data['users'].get(username)
+    user = data['users'].get(purchase.user_id)
     if not user:
-        return {"success": False, "message": "Cannot find user."}
+        raise ValueError("Cannot find user.")
 
-    cost = calculate_qv_cost(credits_to_buy)
+    cost = calculate_qv_cost(purchase.credits_purchased)
 
     if user['donation_balance'] < cost:
-        return {"success": False, "message": "Not enough credits."}
+        raise ValueError("Not enough credits.")
 
+    # Update balances
     user['donation_balance'] -= cost
-    user['voting_credits'] += credits_to_buy
+    user['voting_credits'] += purchase.credits_purchased
     data['donation_pot'] += cost
     
     save_data(data)
@@ -37,4 +37,9 @@ async def buy_voting_credits(username: str, credits_to_buy: int) -> Dict[str, An
     if data['donation_pot'] >= THRESHOLD_AMOUNT and not data.get("is_voting_active"):
         start_new_voting_period()
 
-    return {"success": True, "message": f"'{username}'has purchased {credits_to_buy} tickets with {cost} $.", "new_balance": user['voting_credits']}
+    # Build response
+    return CreditPurchaseResponse(
+        user_id=purchase.user_id,
+        credits_purchased=purchase.credits_purchased,
+      
+    )

@@ -11,7 +11,7 @@ import blockchain.blockchain as block
 """ 
 The setup here means that the setup can be access from any location and device
 """
-router = APIRouter(prefix="/auth", tags=["Blockchain"])
+router = APIRouter(prefix="/block", tags=["Blockchain"])
 
 
 # Base Model

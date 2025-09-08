@@ -1,4 +1,3 @@
-from pydantic import BaseModel
 from typing import Dict, Any, List
 from db.save import load_data, save_data, load_chain_data, save_chain_data
 import json
@@ -7,12 +6,6 @@ import hashlib
 
 THRESHOLD_AMOUNT = 1000
 VOTING_PERIOD_SECONDS = 300
-
-class VoteRequest(BaseModel):
-    username: str
-    proposal_id: str
-    votes: int
-
 def calculate_hash(data_dict: Dict[str, Any]) -> str:
     block_string = json.dumps(data_dict, sort_keys=True).encode()
     return hashlib.sha256(block_string).hexdigest()

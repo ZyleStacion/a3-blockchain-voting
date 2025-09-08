@@ -63,4 +63,34 @@ class TicketResponse(BaseModel):
     
     class Config:
         orm_mode = True
+    
+# Credit purchase schema
+class CreditPurchase(BaseModel):
+    user_id: str
+    credits_purchased: int
+    
+class CreditPurchaseResponse(BaseModel):
+    user_id: str
+    credits_purchased: int
+
+    
+    class Config:
+        orm_mode = True
         
+        
+# Vote proposal schema
+class VoteProposalCreate(BaseModel):    
+    title: str
+    description: str    
+    options: list[str]  # e.g. ["yes", "no", "abstain"]
+
+    
+class VoteProposalResponse(BaseModel):
+    id: str
+    title: str
+    description: str
+    options: list[str]
+
+    
+    class Config:
+        orm_mode = True
