@@ -70,13 +70,13 @@ class Blockchain:
         
         # Populate the block
         genesis_txs = [
-            {"id": "tx000", "sender": "ADMIN", "receiver": "Alice", "amount": 1000},
-            {"id": "tx0001", "sender": "ADMIN", "receiver": "Jeff", "amount": 1000},
-            {"id": "tx0002", "sender": "ADMIN", "receiver": "Carl", "amount": 1000},
-            {"id": "tx0003", "sender": "ADMIN", "receiver": "Edward", "amount": 1000},
-            {"id": "tx0004", "sender": "ADMIN", "receiver": "Kate", "amount": 1000},
-            {"id": "tx0005", "sender": "ADMIN", "receiver": "Joe", "amount": 1000},
-            {"id": "tx0006", "sender": "ADMIN", "receiver": "John", "amount": 1000},
+              {
+                "id": "genesis_tx_0",
+                "sender": "SYSTEM",
+                "receiver": "DAO_POOL",
+                "amount": 0,
+                "description": "Genesis block for DAO voting and donation system"
+                }
         ]
         # In a real block chain, the sender, and receiver will be a form of the wallet address not name
         self.create_block(
