@@ -89,24 +89,16 @@ class VoteProposalResponse(BaseModel):
     options: list[str]
 
 class VoteSubmit(BaseModel):
-    user_id: int         
+    user_id: int
     proposal_id: int
-    votes: Dict[str, int]  # e.g., {"yes": 1}
-    
+
     class Config:
         schema_extra = {
             "example": {
-                "user_id": "1",
-                "proposal_id": "1",
-                "votes": {
-                    "Yes": 0,
-                    "No": 0,
-                    "Abstain": 0
-                }
-
+                "user_id": 1,
+                "proposal_id": 1
             }
         }
-        
 #Donation schema
 class DonationCreate(BaseModel):
     user_id: str

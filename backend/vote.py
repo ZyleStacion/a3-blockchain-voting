@@ -44,8 +44,7 @@ async def create_proposal_endpoint(request: VoteProposalCreate):
     
 @vote_router.post("/submit-vote")
 async def submit_vote_endpoint(request: VoteSubmit):
-    return await create_vote_transaction( 
-        user_id=int(request.user_id),
-        proposal_id=int(request.proposal_id),
-        votes=request.votes
+    return await create_vote_transaction(
+        user_id=request.user_id,
+        proposal_id=request.proposal_id
     )

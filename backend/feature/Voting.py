@@ -19,76 +19,57 @@ def calculate_hash(data_dict: Dict[str, Any]) -> str:
     return hashlib.sha256(block_string).hexdigest()
 
 
-async def create_vote_transaction(user_id: int, proposal_id: int, votes: Dict[str, int]):
-    # 1. Check if user exists
+async def create_vote_transaction(user_id: int, proposal_id: int):
+    # 1. Verify user exists
     user = await users_collection.find_one({"user_id": user_id})
     if not user:
         return {"success": False, "message": f"User ID {user_id} not found."}
 
-    # 2. Check if proposal exists
+    # 2. Verify proposal exists
     proposal = await proposals_collection.find_one({"proposal_id": proposal_id})
     if not proposal:
         return {"success": False, "message": f"Proposal ID {proposal_id} not found."}
 
-   # Step 3: Validate vote options (case-insensitive) and map back to stored options
+    # 3. Load voting options from DB
     valid_options = proposal["options"]
-    option_map = {opt.lower(): opt for opt in valid_options}
 
-    update_fields = {}
+    # 4. Default votes = 0 for all options
+    votes = {opt: 0 for opt in valid_options}
 
-    for opt, count in votes.items():
-        lower_opt = opt.lower()
-
-    if lower_opt not in option_map:
-        return {
-            "success": False,
-            "message": f"Invalid voting option: {opt}. Valid options: {valid_options}"
-        }
-
-    # Use correct casing for MongoDB field update
-    correct_case_opt = option_map[lower_opt]
-    update_fields[f"votes.{correct_case_opt}"] = count
-
-
-    # 4. Create unique transaction ID
+    # 5. Create blockchain transaction
     tx_id = f"vote_{uuid.uuid4().hex[:10]}"
-
-    # 5. Use public_key or user_id
     voter_id = user.get("public_key", str(user_id))
-
-    # 6. Blockchain transaction (optional step: store individual votes)
-    total_votes = sum(votes.values())
 
     tx = Transactions(
         transaction_id=tx_id,
         sender=voter_id,
         receiver=str(proposal_id),
-        amount=total_votes
+        amount=0  # Zero tokens by default, or change if votes are counted
     )
 
     success = blockchain.insert_transaction(tx)
     if not success:
         return {"success": False, "message": "Failed to insert vote transaction."}
 
-    # 7. Mine immediately
     block = blockchain.mine_block(data="Vote", miner="SYSTEM")
     blockchain.save_chain()
 
-    # 8. Update vote counts in MongoDB
-    update_fields = {f"votes.{opt}": count for opt, count in votes.items()}
+    # 6. Update MongoDB: just initialize vote counts if not already present
     await proposals_collection.update_one(
         {"proposal_id": proposal_id},
-        {"$inc": update_fields}
+        {"$setOnInsert": {"votes": votes}}  # Only sets if 'votes' field not set yet
     )
 
     return {
         "success": True,
-        "message": f"Vote recorded successfully.",
+        "message": "Vote setup initialized.",
         "tx_id": tx_id,
         "block_index": block["index"],
         "proposal_id": proposal_id,
-        "voter": voter_id
+        "voter": voter_id,
+        "votes": votes
     }
+
 
 def start_new_voting_period():
     data = load_data()
