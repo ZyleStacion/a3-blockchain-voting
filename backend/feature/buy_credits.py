@@ -41,5 +41,5 @@ def buy_voting_credits(purchase: CreditPurchase) -> CreditPurchaseResponse:
     return CreditPurchaseResponse(
         user_id=purchase.user_id,
         credits_purchased=purchase.credits_purchased,
-      
+    
     )

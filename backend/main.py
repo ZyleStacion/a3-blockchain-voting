@@ -18,8 +18,6 @@ app.include_router(router)
 scheduler = AsyncIOScheduler()
 scheduler.start()
 
-# Moved the check_and_finalize_voting_job to its own function in Voting.py
-
 
 # Schedules the job to check for voting finalization every minute
 scheduler.add_job(check_and_finalize_voting_job, 'interval', seconds=60)

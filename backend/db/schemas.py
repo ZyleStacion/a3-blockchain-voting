@@ -91,6 +91,10 @@ class VoteProposalResponse(BaseModel):
     description: str
     options: list[str]
 
+class VoteSubmit(BaseModel):
+    user_id: str         
+    proposal_id: str
+    votes: int
     
     class Config:
         orm_mode = True
