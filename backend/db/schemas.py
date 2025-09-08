@@ -95,3 +95,16 @@ class VoteSubmit(BaseModel):
     
     class Config:
         orm_mode = True
+        
+#Donation schema
+class DonationCreate(BaseModel):
+    user_id: str
+    amount: float
+class DonationResponse(BaseModel):
+    id: str
+    user_id: str
+    amount: float
+    timestamp: str  # ISO format
+    
+    class Config:
+        orm_mode = True
