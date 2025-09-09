@@ -4,11 +4,12 @@ from db.schemas import TicketPurchase, TicketResponse
 from db.save import load_data, save_data
 from feature.voting import start_new_voting_period, THRESHOLD_AMOUNT
 
-def calculate_qv_cost(credits: int) -> int:
-    return credits ** 2
-
+def calculate_qv_cost(tickets: int) -> int:
+    """Calculates the quadratic cost of purchasing tickets."""
+    return tickets ** 2
 
 def buy_tickets(purchase: TicketPurchase) -> TicketResponse:
+    """Handles the purchase of voting tickets using credits."""
     data = load_data()
 
     if not data:
@@ -21,14 +22,16 @@ def buy_tickets(purchase: TicketPurchase) -> TicketResponse:
     if not user:
         raise ValueError("Cannot find user.")
 
-    cost = calculate_qv_cost(purchase.ticket_purchase)
+    tickets_to_buy = purchase.tickets_to_buy
+    cost = calculate_qv_cost(tickets_to_buy)
 
     if user['donation_balance'] < cost:
         raise ValueError("Not enough credits.")
 
     # Update balances
     user['donation_balance'] -= cost
-    user['voting_credits'] += purchase.ticket_purchase
+    # 'voting_credits'를 'voting_tickets'로 변경하는 것이 더 명확합니다.
+    user['voting_tickets'] += tickets_to_buy
     data['donation_pot'] += cost
     
     save_data(data)
@@ -37,8 +40,7 @@ def buy_tickets(purchase: TicketPurchase) -> TicketResponse:
         start_new_voting_period()
 
     # Build response
-    return TicketPurchase(
+    return TicketResponse(
         user_id=purchase.user_id,
-        credits_purchased=purchase.ticket_purchase,
-    
+        tickets_purchased=tickets_to_buy,
     )
