@@ -1,8 +1,9 @@
 import { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import './Auth.css';
 
 function Signup() {
+  const navigate = useNavigate();
   const [formData, setFormData] = useState({
     username: '',
     email: '',
@@ -31,21 +32,34 @@ function Signup() {
       return;
     }
 
-    try {
-      // TODO: Connect to your FastAPI backend
-      console.log('Signup attempt:', formData);
-      
-      // Simulate API call for now
-      setTimeout(() => {
-        alert('Signup functionality will be connected to backend');
-        setLoading(false);
-        // For demo purposes, redirect to dashboard
-        window.location.href = '/dashboard';
-      }, 1000);
-    } catch (err) {
-      setError('Signup failed. Please try again.');
-      setLoading(false);
+  try {
+    const response = await fetch('http://localhost:8000/auth/signup', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        username: formData.username,
+        email: formData.email,
+        password: formData.password
+      })
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.detail || 'Signup failed');
     }
+
+    const userData = await response.json();
+    console.log('Signup successful:', userData);
+    
+    // Redirect to dashboard
+    navigate('/dashboard');
+    
+  } catch (err) {
+    setError(err.message || 'Signup failed. Please try again.');
+    setLoading(false);
+  }
   };
 
   return (

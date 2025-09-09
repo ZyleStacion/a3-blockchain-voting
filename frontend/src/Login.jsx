@@ -1,8 +1,9 @@
 import { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import './Auth.css';
 
 function Login() {
+  const navigate = useNavigate();
   const [formData, setFormData] = useState({
     email: '',
     password: ''
@@ -31,7 +32,7 @@ function Login() {
         alert('Login functionality will be connected to backend');
         setLoading(false);
         // For demo purposes, redirect to dashboard
-        window.location.href = '/dashboard';
+        navigate('/dashboard');
       }, 1000);
     } catch (err) {
       setError('Login failed. Please try again.');
