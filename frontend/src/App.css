@@ -9,13 +9,13 @@ html, body {
   width: 100%;
   margin: 0;
   padding: 0;
-  overflow: hidden;
-  background-color: #f1f1f1f1;
+  background-color: #f1f1f1;
   color: #333;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', sans-serif;
 }
 
 #root {
-  height: 100vh;
+  min-height: 100vh;
   width: 100%;
   display: flex;
   flex-direction: column;
@@ -27,9 +27,8 @@ html, body {
   display: flex;
   justify-content: center;
   align-items: flex-start;
-  flex: 1;
   overflow: hidden;
-  padding-top: 2rem;
+  padding: 2rem;
 }
 
 .content-main { 
@@ -44,22 +43,78 @@ html, body {
 }
 
 .emoji-main{
-  display: inline-block;
+  display: flex;
+  justify-content: center;
+  align-items: center;
   height: 80px;
   width: 80px;
   font-size: 4rem;
-  text-align: center;
   margin: 0 0;
+  border: 2px solid var(--secondary-color);
+  border-radius: 12px;
 }
 
 .call-to-action {
   padding: 1rem 2rem;
   display: flex;
   justify-content: center;
-  align-items: flex-end;
+  align-items: center;
   gap: 2rem;
   max-width: 1200px;
   width: 100%;
   margin: 0 auto;
   flex-shrink: 0;
+}
+
+/* Spacer to push footer to bottom */
+.spacer {
+  flex: 1;
+}
+
+/* Call to action button styles */
+.cta-button button {
+  background: linear-gradient(135deg, #007bff, #0056b3);
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 1.1rem;
+  font-weight: 600;
+  transition: all 0.3s ease;
+}
+
+.cta-button button:hover {
+  background: linear-gradient(135deg, #0056b3, #004085);
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(0, 123, 255, 0.3);
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+  .home-view {
+    padding: 1rem;
+  }
+  
+  .content-main {
+    flex-direction: column;
+    gap: 2rem;
+    text-align: center;
+  }
+  
+  .call-to-action {
+    flex-direction: column;
+    padding: 1rem;
+    gap: 1rem;
+  }
+  
+  .home-text h1 {
+    font-size: 2rem;
+  }
+  
+  .emoji-main {
+    font-size: 3rem;
+    height: 60px;
+    width: 60px;
+  }
 }

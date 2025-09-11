@@ -1,6 +1,11 @@
 import './App.css'
-import Footer from './Footer'
+import { Routes, Route } from 'react-router-dom'
 import Navbar from './Navbar'
+import Footer from './Footer'
+import Home from './Home'
+import Login from './Login'
+import Signup from './Signup'
+import Dashboard from './Dashboard'
 
 function App() {
   return (
@@ -8,29 +13,16 @@ function App() {
       {/* Navigation Bar */}
       <Navbar />
       
-      {/* Logo, title and description */}
-      <div className="home-view">
-        <div className="content-main">
-          <div className="logo">
-            <p className="emoji-main" alt="Trophy Emoji">🏆</p>
-          </div>
-          <div className="home-text">
-            <h1>BlockAid</h1>
-            <p>Welcome to our blockchain voting app🚀</p>
-          </div>
-        </div>
-      </div>
+      {/* Routes */}
+      <Routes>
+        <Route path="/" element={<Home />} />
+        <Route path="/login" element={<Login />} />
+        <Route path="/signup" element={<Signup />} />
+        <Route path="/dashboard" element={<Dashboard />} />
+      </Routes>
 
-      {/* Call to action: ask users to donate */}
-      <div className="call-to-action">
-        <div className="cta-text">
-          <h2>Donate Now</h2>
-          <p>Disclaimer</p>
-        </div>
-        <div className="cta-button">
-          <button>Cast my vote</button>
-        </div>
-      </div>
+      {/* Spacer to push footer to bottom */}
+      <div className="spacer"></div>
 
       {/* Footer */}
       <Footer />
