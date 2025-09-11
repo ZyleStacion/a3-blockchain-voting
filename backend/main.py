@@ -1,7 +1,12 @@
+# backend/main.py
 from fastapi import FastAPI, APIRouter
+from apscheduler.schedulers.asyncio import AsyncIOScheduler
+from db.save import load_data
+from vote import vote_router  
 from auth import router as auth_router
 from fastapi.middleware.cors import CORSMiddleware
 from vote import vote_router as vote_router
+from block import router as block_router
 
 
 # Set up
@@ -28,6 +33,12 @@ def test_endpoint():
     return {"message": "Welcome to the Blockchain Voting API"}
 
 # Include routers
-app.include_router(router)
 app.include_router(auth_router)
 app.include_router(vote_router)
+app.include_router(block_router)
+
+# Status endpoint
+@app.get("/api/status")
+async def get_status():
+    data = load_data()
+    return data

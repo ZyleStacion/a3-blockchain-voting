@@ -3,4 +3,10 @@ uvicorn==0.30.1
 pydantic==2.8.2
 motor==3.4.0
 pymongo==4.6.1
+<<<<<<< HEAD
+Pydantic
+requests
+apscheduler
+=======
 # Cryptography?
+>>>>>>> 129b2b1934790111e0089b976bd1dca1d34fed28
