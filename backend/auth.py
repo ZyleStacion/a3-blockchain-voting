@@ -15,10 +15,6 @@ def user_helper(user) -> dict:
         "public_key": user.get("public_key", None)
     }
 
-def transaction_help(transaction) -> dict:
-    pass
-
-
 
 @router.post("/signup", response_model=UserResponse)
 async def signup(user: UserCreate):
