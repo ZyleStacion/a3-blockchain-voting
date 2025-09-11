@@ -10,10 +10,19 @@
   z-index: 100;
 }
 
+.navbar-logo a {
+  text-decoration: none;
+}
+
 .navbar-logo h1 {
   font-size: 1.5rem;
   color: #333;
   margin: 0;
+  transition: color 0.3s ease;
+}
+
+.navbar-logo a:hover h1 {
+  color: #007bff;
 }
 
 .navbar-links {
@@ -29,13 +38,17 @@
   color: #007bff;
   font-size: 1rem;
   padding: 0.5rem 1rem;
-  border-radius: 4px;
-  transition: background-color 0.3s ease;
+  border-radius: 8px;
+  transition: all 0.3s ease;
+  font-weight: 500;
 }
 
 .navbar-links li a:hover {
-  background-color: #e7f3ff;
+  background-color: #007bff;
+  color: white;
   text-decoration: none;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 123, 255, 0.3);
 }
 
 /* Responsive design */
