@@ -3,7 +3,7 @@
 from http.client import HTTPException
 from fastapi import APIRouter
 from feature.tickets import buy_tickets
-from feature.voting import create_vote_transaction
+from feature.Voting import create_vote_transaction
 from db.schemas import TicketPurchase, CreditPurchaseResponse, VoteProposalCreate, VoteSubmit
 from db.database import proposals_collection, users_collection, get_next_proposal_id
 

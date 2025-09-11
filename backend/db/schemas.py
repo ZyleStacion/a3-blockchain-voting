@@ -49,14 +49,14 @@ class TransactionResponse(BaseModel):
         orm_mode = True
         
         
-#Ticket schema
+# Ticket schema
 class TicketPurchase(BaseModel):
     user_id: str
-    ticket_purchase: int
-    
+    tickets_to_buy: int  # ticket_purchase -> tickets_to_buy
+
 class TicketResponse(BaseModel):
     user_id: str
-    ticket_purchase: int
+    tickets_purchased: int  # ticket_purchase -> tickets_purchased
     
     class Config:
         orm_mode = True
@@ -91,12 +91,13 @@ class VoteProposalResponse(BaseModel):
 class VoteSubmit(BaseModel):
     user_id: int
     proposal_id: int
-
+    tickets: int  # Added number of tickets voted by user
     class Config:
         schema_extra = {
             "example": {
                 "user_id": 1,
-                "proposal_id": 1
+                "proposal_id": 1,
+                "tickets": 10
             }
         }
 #Donation schema
