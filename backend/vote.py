@@ -1,7 +1,6 @@
 # backend/vote.py
 
-from http.client import HTTPException
-from fastapi import APIRouter
+from fastapi import APIRouter, HTTPException
 from feature.tickets import buy_tickets
 from feature.voting import create_vote_transaction
 from db.schemas import TicketPurchase, CreditPurchaseResponse, VoteProposalCreate, VoteSubmit
@@ -52,3 +51,23 @@ async def submit_vote_endpoint(request: VoteSubmit):
         proposal_id=request.proposal_id,
         tickets=request.tickets
     )
+
+@vote_router.get("/active-proposals")
+async def get_active_proposals():
+    """Get all active voting proposals"""
+    try:
+        proposals = await proposals_collection.find({}).to_list(100)
+        return proposals
+    except Exception as e:
+        raise HTTPException(status_code=500, detail="Failed to fetch proposals")
+
+@vote_router.get("/proposal/{proposal_id}")
+async def get_proposal(proposal_id: int):
+    """Get a specific proposal by ID"""
+    try:
+        proposal = await proposals_collection.find_one({"_id": proposal_id})
+        if not proposal:
+            raise HTTPException(status_code=404, detail="Proposal not found")
+        return proposal
+    except Exception as e:
+        raise HTTPException(status_code=500, detail="Failed to fetch proposal")

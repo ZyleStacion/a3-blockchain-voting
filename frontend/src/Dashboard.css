@@ -97,3 +97,34 @@
     padding: 1.5rem;
   }
 }
+
+/* Additional styles for proposal items */
+.proposals-list {
+  margin-top: 1rem;
+}
+
+.proposal-item {
+  background: #f8f9fa;
+  border: 1px solid #e9ecef;
+  border-radius: 8px;
+  padding: 1rem;
+  margin-bottom: 1rem;
+}
+
+.proposal-item h4 {
+  margin: 0 0 0.5rem 0;
+  color: #333;
+  font-size: 1.1rem;
+}
+
+.proposal-item p {
+  margin: 0 0 1rem 0;
+  color: #666;
+  font-size: 0.9rem;
+}
+
+.error {
+  color: #dc3545;
+  font-size: 0.9rem;
+  margin-top: 1rem;
+}
