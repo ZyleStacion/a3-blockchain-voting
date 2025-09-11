@@ -32,34 +32,44 @@ function Signup() {
       return;
     }
 
-  try {
-    const response = await fetch('http://localhost:8000/auth/signup', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        username: formData.username,
-        email: formData.email,
-        password: formData.password
-      })
-    });
+    try {
+      const response = await fetch('http://localhost:8000/auth/signup', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          username: formData.username,
+          email: formData.email,
+          password: formData.password
+        })
+      });
 
-    if (!response.ok) {
-      const errorData = await response.json();
-      throw new Error(errorData.detail || 'Signup failed');
+      if (!response.ok) {
+        let errorMessage = 'Signup failed';
+        try {
+          const errorData = await response.json();
+          errorMessage = errorData.detail || errorMessage;
+        } catch {
+          // response was not JSON
+        }
+        throw new Error(errorMessage);
+      }
+
+      const userData = await response.json();
+      console.log('Signup successful:', userData);
+
+      // Store user in localStorage (or context) for dashboard
+      localStorage.setItem('user', JSON.stringify(userData));
+
+      // Redirect to dashboard
+      navigate('/dashboard');
+      
+    } catch (err) {
+      setError(err.message || 'Signup failed. Please try again.');
+    } finally {
+      setLoading(false);
     }
-
-    const userData = await response.json();
-    console.log('Signup successful:', userData);
-    
-    // Redirect to dashboard
-    navigate('/dashboard');
-    
-  } catch (err) {
-    setError(err.message || 'Signup failed. Please try again.');
-    setLoading(false);
-  }
   };
 
   return (
