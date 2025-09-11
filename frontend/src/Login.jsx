@@ -5,7 +5,7 @@ import './Auth.css';
 function Login() {
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
-    email: '',
+    username: '',
     password: ''
   });
   const [loading, setLoading] = useState(false);
@@ -18,27 +18,39 @@ function Login() {
     });
   };
 
-  const handleSubmit = async (e) => {
+ const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
     setError('');
 
     try {
-      // TODO: Connect to your FastAPI backend
-      console.log('Login attempt:', formData);
-      
-      // Simulate API call for now
-      setTimeout(() => {
-        alert('Login functionality will be connected to backend');
-        setLoading(false);
-        // For demo purposes, redirect to dashboard
-        navigate('/dashboard');
-      }, 1000);
+      const response = await fetch('http://localhost:8000/auth/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(formData)
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.detail || 'Login failed');
+      }
+
+      const data = await response.json();
+
+      // Save user info (optional)
+      localStorage.setItem('user', JSON.stringify(data));
+
+      // Redirect to dashboard
+      navigate('/dashboard');
     } catch (err) {
-      setError('Login failed. Please try again.');
+      setError(err.message);
+    } finally {
       setLoading(false);
     }
   };
+
 
   return (
     <div className="auth-container">
@@ -48,12 +60,12 @@ function Login() {
         
         <form onSubmit={handleSubmit}>
           <div className="form-group">
-            <label htmlFor="email">Email:</label>
+            <label htmlFor="username">Username:</label>
             <input
-              type="email"
-              id="email"
-              name="email"
-              value={formData.email}
+              type="text"
+              id="username"
+              name="username"
+              value={formData.username}
               onChange={handleChange}
               required
             />
