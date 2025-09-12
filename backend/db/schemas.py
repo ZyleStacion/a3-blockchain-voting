@@ -15,6 +15,8 @@ class UserResponse(BaseModel):
     id: int
     username: str
     email: str   # <-- add this
+    donation_balance: Optional[float] = 100000.0
+    voting_tickets: Optional[int] = 0
     public_key: str
     
     class Config:
@@ -51,12 +53,12 @@ class TransactionResponse(BaseModel):
         
 # Ticket schema
 class TicketPurchase(BaseModel):
-    user_id: str
-    tickets_to_buy: int  # ticket_purchase -> tickets_to_buy
-
+    user_id: int
+    ticket_purchase: int
+    
 class TicketResponse(BaseModel):
-    user_id: str
-    tickets_purchased: int  # ticket_purchase -> tickets_purchased
+    user_id: int
+    ticket_purchase: int
     
     class Config:
         orm_mode = True
@@ -77,9 +79,9 @@ class CreditPurchaseResponse(BaseModel):
         
 # Vote proposal schema
 class VoteProposalCreate(BaseModel):    
-        title: str
-        description: str    
-        options: list[str]  # e.g. ["yes", "no", "abstain"]
+    title: str
+    description: str    
+    options: list[str]  # e.g. ["yes", "no", "abstain"]
 
     
 class VoteProposalResponse(BaseModel):
@@ -91,13 +93,14 @@ class VoteProposalResponse(BaseModel):
 class VoteSubmit(BaseModel):
     user_id: int
     proposal_id: int
-    tickets: int  # Added number of tickets voted by user
+    tickets: int
+
     class Config:
         schema_extra = {
             "example": {
                 "user_id": 1,
                 "proposal_id": 1,
-                "tickets": 10
+                "tickets": 5
             }
         }
 #Donation schema

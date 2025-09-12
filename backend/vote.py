@@ -1,28 +1,28 @@
 # backend/vote.py
-
-from http.client import HTTPException
-from fastapi import APIRouter
+from fastapi import APIRouter, HTTPException
 from feature.tickets import buy_tickets
 from feature.Voting import create_vote_transaction
 from db.schemas import TicketPurchase, CreditPurchaseResponse, VoteProposalCreate, VoteSubmit
-from db.database import proposals_collection, users_collection, get_next_proposal_id
+from db.database import proposals_collection, get_next_proposal_id, users_collection
 
 vote_router = APIRouter(prefix="/vote", tags=["Vote"])
 
-# ❌ The call to start_new_voting_period() should not be at the top level.
-# It should be triggered by an event, such as the donation pot reaching the threshold.
-# We will rely on the logic in buy_tickets.py to handle this.
 
-@vote_router.post("/buy-tickets", response_model=CreditPurchaseResponse)
+@vote_router.post("/buy-tickets")
 async def buy_tickets_endpoint(request: TicketPurchase):
-    return await buy_tickets(request)
+    result = await buy_tickets(request)
 
+    if not result.get("success", False):
+        raise HTTPException(status_code=400, detail=result["message"])
+
+    return result
+
+    
 @vote_router.post("/create-proposal")
 async def create_proposal_endpoint(request: VoteProposalCreate):
-    # 🔢 Generate simple ID
     proposal_id = await get_next_proposal_id()
 
-    # 🧱 Build the document
+    # Build the document
     proposal_data = {
         "_id": proposal_id,
         "title": request.title,
@@ -31,13 +31,13 @@ async def create_proposal_endpoint(request: VoteProposalCreate):
         "votes": {opt: 0 for opt in request.options}
     }
 
-    # 💾 Insert into MongoDB
+    # Insert into MongoDB
     result = await proposals_collection.insert_one(proposal_data)
 
     if not result.inserted_id:
         raise HTTPException(status_code=500, detail="Failed to create proposal")
 
-    # ✅ Return readable ID
+    # Return readable ID
     return {
         "success": True,
         "id": proposal_id,
