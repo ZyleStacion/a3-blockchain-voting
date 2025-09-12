@@ -35,7 +35,7 @@ async def create_proposal_endpoint(request: VoteProposalCreate):
     result = await proposals_collection.insert_one(proposal_data)
 
     if not result.inserted_id:
-        raise HTTPException(status_code=500, detail="Failed to create proposal")
+        raise HTTPException(status_code=500, detail="Failed to create proposal")    
 
     # Return readable ID
     return {
