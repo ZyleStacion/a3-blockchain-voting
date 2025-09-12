@@ -1,9 +1,9 @@
 import datetime
 import uuid
-from db.schemas import TicketPurchase, TicketResponse
-from db.database import users_collection
-from db.save import load_data, save_data
-from feature.voting import start_new_voting_period, THRESHOLD_AMOUNT
+from ..db.schemas import TicketPurchase, TicketResponse
+from ..db.database import users_collection
+from ..db.save import load_data, save_data
+from ..feature.Voting import start_new_voting_period, THRESHOLD_AMOUNT
 
 def calculate_qv_cost(tickets: int) -> int:
     """Calculates the quadratic cost of purchasing tickets."""

@@ -3,8 +3,8 @@ import uuid
 import time
 import json
 import hashlib
-from db.database import proposals_collection, users_collection, votes_collection, get_settings_collection
-from blockchain.blockchain import Blockchain, Transactions
+from ..db.database import proposals_collection, users_collection, votes_collection, get_settings_collection
+from ..blockchain.blockchain import Blockchain, Transactions
 
 # -- Initialize global settings --
 THRESHOLD_AMOUNT = 1000

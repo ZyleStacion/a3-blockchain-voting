@@ -1,4 +1,5 @@
 from motor.motor_asyncio import AsyncIOMotorClient
+from typing import Dict, Any
 
 MONGO_URL = "mongodb+srv://ankhanhthinj_db_user:lhci4I2IlC4c3Qdh@donation.s0fjrkj.mongodb.net/"  # or your MongoDB Atlas URI
 DB_NAME = "donation_dao"
@@ -12,6 +13,7 @@ votes_collection = db["votes"]
 transactions_collection = db["transactions"]
 proposals_collection = db["proposals"]
 counters_collection = db["counters"]
+settings_collection = db["settings"]
 
 
 
@@ -32,3 +34,17 @@ async def get_next_proposal_id():
         return_document=True
     )
     return counter["seq"]
+
+def get_settings_collection():
+    return db.settings
+
+def get_database_collections() -> Dict[str, Any]:
+    """Returns a dictionary of all database collections."""
+    return {
+        "users_collection": users_collection,
+        "votes_collection": votes_collection,
+        "transactions_collection": transactions_collection,
+        "proposals_collection": proposals_collection,
+        "counters_collection": counters_collection,
+        "settings_collection": settings_collection
+    }

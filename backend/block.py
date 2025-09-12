@@ -1,31 +1,25 @@
-from fastapi import APIRouter, Form, HTTPException
+from fastapi import APIRouter, Form, HTTPException, Depends
 from pydantic import BaseModel
-from fastapi.middleware.cors import CORSMiddleware
-from blockchain.blockchain import  Transactions
-from blockchain.blockchain_singleton import blockchain  
+from typing import List, Dict, Any
+
+from .blockchain.blockchain import Blockchain, Transactions
+from .db.database import get_database_collections, get_settings_collection
 
 # Router setup
 router = APIRouter(prefix="/blockchain", tags=["Blockchain"])
 
 
-# --- Models ---
-class GetTransactions(BaseModel):
-    id: str
-    sender: str
-    receiver: str
-    amount: float
-
-
 # --- Endpoints ---
 
-# Get all blockchain data
-@router.get("/blockchain")
-def get_blockchain_data():
+@router.get("/")
+async def get_blockchain_data():
+    # In a MongoDB-based system, you would retrieve blocks and transactions from the DB.
+    # For now, we will assume an in-memory blockchain for validation and display purposes.
+    # A full implementation would involve loading the entire chain from the database.
     if not blockchain.is_chain_valid():
         raise HTTPException(status_code=400, detail="Invalid Blockchain")
 
     return {
-        "index": len(blockchain.chain),
         "valid": True,
         "pending_count": len(blockchain.pending_transactions),
         "pending_transactions": blockchain.pending_transactions,
@@ -33,66 +27,60 @@ def get_blockchain_data():
     }
 
 
-# Get single block by index
-@router.get("/blockchain/{index}")
-def get_single_block(index: int):
+@router.get("/{index}")
+async def get_single_block(index: int):
     if index < 0 or index >= len(blockchain.chain):
         raise HTTPException(status_code=404, detail="Block not found")
     return blockchain.chain[index]
 
 
-# Mine block
 @router.post("/mine_block/")
-def mine_block(data: str, miner: str):
-    if not blockchain.is_chain_valid():
-        raise HTTPException(status_code=400, detail="Invalid Blockchain")
+async def mine_block(miner: str = Form(...), collections: Dict[str, Any] = Depends(get_database_collections)):
+    proposals_collection = collections["proposals_collection"]
+    settings_collection = get_settings_collection()
+    
+    # Check if a voting session is in progress
+    voting_status = await settings_collection.find_one({"_id": "voting_status"})
+    if voting_status and voting_status.get("status") == "in_progress":
+        raise HTTPException(status_code=400, detail="Cannot mine a new block while a voting session is active.")
+        
+    # Get all unconfirmed proposals from the database
+    unconfirmed_proposals = await proposals_collection.find({"confirmed": False}).to_list(length=None)
+    
+    # If there are no unconfirmed proposals, there's nothing to mine
+    if not unconfirmed_proposals:
+        raise HTTPException(status_code=400, detail="No unconfirmed proposals to mine.")
+    
+    # Create the block with the unconfirmed proposals
+    block = blockchain.mine_block(data=unconfirmed_proposals, miner=miner)
+    
+    # Update the status of the proposals to confirmed
+    for proposal in unconfirmed_proposals:
+        await proposals_collection.update_one(
+            {"_id": proposal["_id"]},
+            {"$set": {"confirmed": True}}
+        )
 
-    block = blockchain.mine_block(data=data, miner=miner)
     return {"message": f"Block mined by {miner}!", "block": block}
 
 
-# --- Transactions ---
-
-# Create transaction
-@router.post("/create_transactions")
-def create_transactions_form(
-    id: str = Form(..., description="Transaction ID, e.g. tx001"),
-    sender: str = Form(..., description="Sender name, e.g. Alice"),
-    receiver: str = Form(..., description="Receiver name, e.g. Bob"),
-    amount: float = Form(..., description="Amount, e.g. 100"),
-):
-    trans = Transactions(
-        transaction_id=id,
-        sender=sender,
-        receiver=receiver,
-        amount=amount,
-    )
-
-    valid = blockchain.insert_transaction(trans)
-    if not valid:
-        raise HTTPException(status_code=400, detail="Invalid Transaction")
-
-    return {
-        "accepted": True,
-        "size": len(blockchain.pending_transactions),
-    }
-
-
-# Get pending transactions
 @router.get("/pending_transactions")
-def get_pending_transactions():
+async def get_pending_transactions(collections: Dict[str, Any] = Depends(get_database_collections)):
+    votes_collection = collections["votes_collection"]
+    pending_transactions = await votes_collection.find().to_list(length=None)
+    
     return {
-        "pending_transactions": blockchain.pending_transactions,
-        "count": len(blockchain.pending_transactions),
+        "pending_transactions": pending_transactions,
+        "count": len(pending_transactions),
     }
 
 
-# Get balance of a user
 @router.get("/balance/{user}")
-def get_balance(user: str):
-    if not user:
-        raise HTTPException(status_code=400, detail="No user")
-
-    balance = blockchain.get_balance(user)
-    return {"user": user, "balance": balance}
-
+async def get_balance(user: str, collections: Dict[str, Any] = Depends(get_database_collections)):
+    users_collection = collections["users_collection"]
+    user_data = await users_collection.find_one({"username": user})
+    
+    if not user_data:
+        raise HTTPException(status_code=404, detail="User not found")
+        
+    return {"user": user, "balance": user_data.get("credit_balance", 0)}
