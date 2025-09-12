@@ -51,7 +51,7 @@ class TransactionResponse(BaseModel):
         orm_mode = True
         
         
-#Ticket schema
+# Ticket schema
 class TicketPurchase(BaseModel):
     user_id: int
     ticket_purchase: int

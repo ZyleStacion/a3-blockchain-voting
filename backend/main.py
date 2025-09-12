@@ -2,6 +2,7 @@
 from fastapi import FastAPI, APIRouter
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from db.save import load_data
+from feature.Voting import check_and_finalize_voting_job
 from vote import vote_router  
 from auth import router as auth_router
 from fastapi.middleware.cors import CORSMiddleware
