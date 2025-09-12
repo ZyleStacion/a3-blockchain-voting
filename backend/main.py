@@ -6,6 +6,7 @@ from auth import router as auth_router
 from fastapi.middleware.cors import CORSMiddleware
 from vote import vote_router as vote_router
 from block import router as block_router
+from donation import donation_router as donation_router
 from blockchain.blockchain_singleton import blockchain
 
 # Set up
@@ -41,6 +42,7 @@ def test_endpoint():
 # Include routers
 app.include_router(auth_router)
 app.include_router(vote_router)
+app.include_router(donation_router)
 app.include_router(block_router)
 
 # Status endpoint

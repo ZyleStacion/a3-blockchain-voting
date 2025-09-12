@@ -83,7 +83,6 @@ class VoteProposalCreate(BaseModel):
     description: str    
     options: list[str]  # e.g. ["yes", "no", "abstain"]
 
-    
 class VoteProposalResponse(BaseModel):
     id: int
     title: str
@@ -105,13 +104,22 @@ class VoteSubmit(BaseModel):
         }
 #Donation schema
 class DonationCreate(BaseModel):
-    user_id: str
+    user_id: int
     amount: float
-class DonationResponse(BaseModel):
-    id: str
-    user_id: str
-    amount: float
-
+    message: str
     
+        
+class DonationResponse(BaseModel):
+    donation_id: int
+    user_id: int
+    amount: float
+    message: str = "Donation successful"
+
     class Config:
-        orm_mode = True
+         schema_extra = {
+            "example": {
+                "user_id": 1,
+                "amount": 1,
+                "message": "Donation for a good cause"
+            }
+        }

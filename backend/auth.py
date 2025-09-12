@@ -22,7 +22,6 @@ async def signup(user: UserCreate):
 
     private_key, public_key = generate_key()
 
-    # 🔢 Get a human-readable user ID
     user_id = await get_next_user_id()
 
     user_doc = {
