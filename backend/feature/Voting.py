@@ -1,6 +1,6 @@
 from typing import Dict, Any, List
 import uuid
-from db.database import proposals_collection, users_collection
+from db.database import proposals_collection, users_collection, votes_collection
 from blockchain.blockchain import Blockchain, Transactions
 import json
 import time
@@ -19,12 +19,9 @@ def calculate_hash(data_dict: Dict[str, Any]) -> str:
     block_string = json.dumps(data_dict, sort_keys=True).encode()
     return hashlib.sha256(block_string).hexdigest()
 
-async def create_vote_transaction(user_id: str, proposal_id: str, tickets: int):
-    # This function now needs to reflect the new MongoDB data model.
-    # It should decrement the user's tickets and add a transaction.
-    
+async def create_vote_transaction(user_id: int, proposal_id: int, tickets: int):
     # 1. Verify user exists and has enough tickets
-    user = await users_collection.find_one({"_id": user_id})
+    user = await users_collection.find_one({"user_id": int(user_id)})
     if not user:
         return {"success": False, "message": f"User ID {user_id} not found."}
 
@@ -32,22 +29,35 @@ async def create_vote_transaction(user_id: str, proposal_id: str, tickets: int):
         return {"success": False, "message": "Not enough tickets to vote."}
 
     # 2. Verify proposal exists
-    proposal = await proposals_collection.find_one({"_id": proposal_id})
+    proposal = await proposals_collection.find_one({"proposal_id": int(proposal_id)})
     if not proposal:
         return {"success": False, "message": f"Proposal ID {proposal_id} not found."}
 
     # 3. Decrement user's tickets
     await users_collection.update_one(
-        {"_id": user_id},
+        {"user_id": int(user_id)},
         {"$inc": {"voting_tickets": -tickets}}
     )
 
-    # 4. Record vote on the blockchain
-    return record_vote_on_chain(
-        voter_pubkey=user.get("public_key", str(user_id)),
-        proposal_id=proposal_id,
-        tickets=tickets
-    )
+    # 4. Record vote (for now: store in Mongo instead of blockchain)
+    vote_doc = {
+        "user_id": user_id,
+        "proposal_id": proposal_id,
+        "tickets_used": tickets
+    }
+    result = await votes_collection.insert_one(vote_doc)
+
+    if not result.inserted_id:
+        return {"success": False, "message": "Failed to insert vote transaction."}
+
+    return {
+        "success": True,
+        "message": f"Vote recorded for proposal {proposal_id}",
+        "user_id": user_id,
+        "proposal_id": proposal_id,
+        "tickets_used": tickets
+    }
+
 
 def start_new_voting_period():
     # This logic now needs to be part of the ticket purchase process,

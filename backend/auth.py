@@ -1,7 +1,6 @@
-from fastapi import APIRouter, HTTPException, Depends
+from fastapi import APIRouter, HTTPException
 from db.database import users_collection, get_next_user_id
 from db.schemas import UserCreate, UserLogin, UserResponse
-from bson import ObjectId
 from utils.DigitalSignature import generate_key
 
 router = APIRouter(prefix="/auth", tags=["Authentication"])
@@ -26,9 +25,16 @@ async def signup(user: UserCreate):
     # 🔢 Get a human-readable user ID
     user_id = await get_next_user_id()
 
-    user_doc = user.dict()
-    user_doc["user_id"] = user_id
-    user_doc["public_key"] = public_key
+    user_doc = {
+        "user_id": user_id,
+        "username": user.username,
+        "email": user.email,
+        "password": user.password,      
+        "public_key": public_key,
+        "donation_balance": 0.0,        
+        "voting_tickets": 0             
+    }
+
 
     result = await users_collection.insert_one(user_doc)
     new_user = await users_collection.find_one({"_id": result.inserted_id})
@@ -39,7 +45,7 @@ async def login(user: UserLogin):
     db_user = await users_collection.find_one({"username": user.username})
     if not db_user:
         raise HTTPException(status_code=401, detail="Invalid credentials")
-
+ 
     if db_user["password"] != user.password:
         raise HTTPException(status_code=401, detail="Invalid credentials")
 
