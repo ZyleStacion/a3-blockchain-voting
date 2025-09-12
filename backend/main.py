@@ -29,6 +29,8 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+
 @router.get("/")
 def test_endpoint():
     return {"message": "Welcome to the Blockchain Voting API"}
@@ -43,3 +45,6 @@ app.include_router(block_router)
 async def get_status():
     data = load_data()
     return data
+
+if __name__ == "__main__": # Alow to be access from anywhere
+    uvicorn.run(app, host="0.0.0.0", port=8000)
