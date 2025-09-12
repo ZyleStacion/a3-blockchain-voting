@@ -4,7 +4,7 @@ import json
 
 class Block:
     def __init__(self, block_index, time_created, transactions, previous_hash, nonce):
-       
+    
         self.block_index = block_index
         self.time_created = time_created 
         self.transactions = transactions
@@ -14,13 +14,15 @@ class Block:
 
     def to_dict(self) -> dict:
         return {
-            "index": self.index,
-            "timestamp": self.timestamp,
+            "index": self.block_index,
+            "timestamp": self.time_created,
             "transactions": self.transactions,
-            "proof": self.proof,
+            "nonce": self.nonce,
             "previous_hash": self.previous_hash,
+            "hash": self.hash,
         }
-    
+
+
 class Transactions:
     def __init__(self, transaction_id, sender, receiver, amount):
         self.ids = transaction_id
@@ -39,51 +41,41 @@ class Transactions:
 class Blockchain: 
     # This class will store data which a normal blockchain should have
     def __init__(self):
-
         self.chain = []
         self.pending_transactions = []
-        self.difficulty = 3  # initial difficulty level
-        # Populate the block
+        self.difficulty = 3
+
         genesis_txs = [
-              {
+            {
                 "id": "genesis_tx_0",
                 "sender": "SYSTEM",
                 "receiver": "DAO_POOL",
                 "amount": 0,
                 "description": "Genesis block for DAO voting and donation system"
-                }
+            }
         ]
-        # In a real block chain, the sender, and receiver will be a form of the wallet address not name
-        self.create_block(
-            data="Genesis Block",
-            proof=1,
-            previous_hash="0",
-            index=0,
-        )
-        
-        # Store genesis transactions inside the first block
-        self.chain[0]["transactions"] = genesis_txs
 
-    def to_digest(self, new_proof: int, previous_proof: int, index: str, data: str) -> bytes:
-        """
-        Its job is to hashed the inputted string and it will results
-        in unique string of bytes -> for miner to solve
+        genesis_block = {
+            "index": 0,
+            "timestamp": str(datetime.datetime.utcnow()),
+            "data": "Genesis Block",
+            "transactions": genesis_txs,
+            "proof": 1,  # could also run proof_of_work
+            "previous_hash": "0",
+            "difficulty": self.difficulty,
+        }
+        genesis_block["hash"] = self.hash_value(genesis_block, include_hash=False)
+        self.chain.append(genesis_block)
 
-        Args:
-            new_proof (int): new proof from the new block
-            previous_proof (int): Proof from previous block
-            index (str): Index of a block
-            data (str): The data of the block
 
-        Returns:
-            bytes: Hashed value of inputted string
-        """
-        #
-        
-        to_digest = str(new_proof ** 2 - previous_proof **2 + index) + data
-        return to_digest.encode()
-    
-    # Proof of work
+    def to_digest(self, new_proof: int, previous_proof: int, index: int, data: str, transactions: list = None) -> bytes:
+        if transactions is None:
+            transactions = []
+        tx_string = json.dumps(transactions, sort_keys=True)
+        to_digest = f"{new_proof}{previous_proof}{index}{data}{tx_string}".encode()
+        return to_digest
+
+        # Proof of work
     def proof_of_work(self, previous_proof: int, index: int, data: str, transactions: list = None) -> int:
         """
         Simplified Proof-of-Work for DAO voting.
@@ -105,7 +97,6 @@ class Blockchain:
 
             new_proof += 1
 
-    
     #Adjust difficulty of mining
     def difficulty_adjustment(self):
         old_difficulty = self.difficulty
@@ -116,25 +107,14 @@ class Blockchain:
             self.difficulty -= 1
             
     # Hash value
-    def hash_value(self, block):
-        """
-        Hash block using SHA-256
-
-        Args:
-            block (_type_): Block that is used tobe hashed
-
-        Returns:
-            _type_:  The SHA-256 value of the hashed blocked
-        """
-        def convert_bytes(obj):
-            if isinstance(obj, bytes):
-                return obj.decode()  # Convert b'text' -> 'text'
-            raise TypeError(f"Object of type {obj.__class__.__name__} is not JSON serializable")
-
+    def hash_value(self, block: dict, include_hash: bool = False) -> str:
         block_copy = dict(block)
-        encoded_block = json.dumps(block_copy, sort_keys=True, default=convert_bytes).encode()
+        if "hash" in block_copy and not include_hash:
+            block_copy.pop("hash")
+        encoded_block = json.dumps(block_copy, sort_keys=True).encode()
         return hashlib.sha256(encoded_block).hexdigest()
-                
+
+
     # ---- Block ----
     def auto_mine_block(self, data: str = "Vote Block") -> dict:
         if not self.pending_transactions:
@@ -179,12 +159,12 @@ class Blockchain:
             "index": index,
             "timestamp": str(datetime.datetime.now()),
             "data": data,
-            "transactions": self.pending_transactions.copy(),   # include txs here
+            "transactions": self.pending_transactions.copy(),
             "proof": proof,
             "previous_hash": previous_hash,
             "difficulty": self.difficulty,
-            "none": proof
         }
+        
         block["hash"] = self.hash_value(block)
         self.pending_transactions = []  # clear the pool after mining
         self.chain.append(block)
@@ -203,37 +183,40 @@ class Blockchain:
     # Chain integreity 
     def is_chain_valid(self) -> bool:
         """
-        Ensure that the chain is still valid and no alteration has been made.
+        Ensure the chain is valid:
+        - Each block correctly references the previous hash
+        - Each block's proof-of-work is valid
+        - Each block's stored hash matches its actual contents
         """
-        previous_block = self.chain[0]
-        block_index = 1
+        for i in range(1, len(self.chain)):
+            current_block = self.chain[i]
+            previous_block = self.chain[i - 1]
 
-        while block_index < len(self.chain):
-            block = self.chain[block_index]
-
-            if block['previous_hash'] != self.hash_value(previous_block):
+            # 1. Check previous_hash link (ignore 'hash' field in computation)
+            if current_block["previous_hash"] != self.hash_value(previous_block, include_hash=False):
                 return False
 
-            current_proof = previous_block['proof']
-            next_index, next_data, next_proof = (
-                block["index"],
-                block["data"],
-                block["proof"],
-            )
+            # 2. Validate proof-of-work
+            proof = current_block["proof"]
+            prev_proof = previous_block["proof"]
+            index = current_block["index"]
+            data = current_block["data"]
 
+            check_hash = hashlib.sha256(
+                self.to_digest(
+                    new_proof=proof,
+                    previous_proof=prev_proof,
+                    index=index,
+                    data=data,
+                )
+            ).hexdigest()
 
-            hash_value = hashlib.sha256(self.to_digest(
-                new_proof=next_proof,
-                previous_proof=current_proof,
-                index=next_index,
-                data=next_data
-            )).hexdigest()
-
-            if not hash_value.startswith("0" * block["difficulty"]):
+            if not check_hash.startswith("0" * current_block["difficulty"]):
                 return False
 
-            previous_block = block
-            block_index += 1
+            # 3. Ensure stored hash matches actual block hash
+            if current_block.get("hash") != self.hash_value(current_block, include_hash=False):
+                return False
 
         return True
 
@@ -248,7 +231,6 @@ class Blockchain:
 
         with open("blockchain.json", "w") as f:
             json.dump(self.chain, f, indent=4, default=convert_bytes)
-
 
     # Load block chain
     def load_chain(self):

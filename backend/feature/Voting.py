@@ -2,6 +2,7 @@ from typing import Dict, Any, List
 import uuid
 from db.database import proposals_collection, users_collection
 from blockchain.blockchain import Blockchain, Transactions
+from blockchain.blockchain_singleton import blockchain
 import json
 import time
 import hashlib
@@ -9,8 +10,6 @@ import hashlib
 THRESHOLD_AMOUNT = 1000
 VOTING_PERIOD_SECONDS = 300
 
-# Initialize global blockchain instance
-blockchain = Blockchain()
 
 def calculate_hash(data_dict: Dict[str, Any]) -> str:
     block_string = json.dumps(data_dict, sort_keys=True).encode()

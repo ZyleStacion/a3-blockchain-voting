@@ -1,7 +1,7 @@
 [
     {
         "index": 0,
-        "timestamp": "2025-09-12 13:55:09.142371",
+        "timestamp": "2025-09-12 08:37:59.585660",
         "data": "Genesis Block",
         "transactions": [
             {
@@ -15,43 +15,23 @@
         "proof": 1,
         "previous_hash": "0",
         "difficulty": 3,
-        "none": 1,
-        "hash": "569bc49f796196345a3862751c5ac5efcc7c9ecb62a622fe91ef173d9eb9ebca"
+        "hash": "24f71058a8b3ecb13eeac5fc48af294fea3dc4d601b68b22b05c3d4835e16882"
     },
     {
         "index": 1,
-        "timestamp": "2025-09-12 13:55:21.718356",
+        "timestamp": "2025-09-12 15:38:09.100839",
         "data": "Vote Block",
         "transactions": [
             {
-                "id": "vote_2_1_5",
-                "sender": "2",
+                "id": "vote_1_1_5",
+                "sender": "1",
                 "receiver": "1",
                 "amount": 5
             }
         ],
         "proof": 1314,
-        "previous_hash": "08dddb2d06facafb8bea4445629028cd6e9daf68195454adece8bd2e4dd39944",
+        "previous_hash": "24f71058a8b3ecb13eeac5fc48af294fea3dc4d601b68b22b05c3d4835e16882",
         "difficulty": 3,
-        "none": 1314,
-        "hash": "ca8d20196285c9a31098b6d9c3cdb838320462c23282f3a053cc6235d71f9b9f"
-    },
-    {
-        "index": 2,
-        "timestamp": "2025-09-12 13:55:27.018438",
-        "data": "Vote Block",
-        "transactions": [
-            {
-                "id": "vote_2_2_5",
-                "sender": "2",
-                "receiver": "2",
-                "amount": 5
-            }
-        ],
-        "proof": 4769,
-        "previous_hash": "378d08de46c339aadf6884f93825320f6b86bc99e11eb5f50dbe08acf330354d",
-        "difficulty": 3,
-        "none": 4769,
-        "hash": "22a164b6e15c8cc2fa65159b835b57d50fb46adcea888de6a9ea921af55b21da"
+        "hash": "adb10c7ef90907604a7ad8e1c31ec33a61e4737bccb5b6cf5f169f29a24703a5"
     }
 ]
