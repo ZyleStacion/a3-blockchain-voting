@@ -25,6 +25,37 @@ function Signup() {
     setLoading(true);
     setError('');
 
+    // Validate form fields
+    if (formData.username.length < 3) {
+      setError('Username must be at least 3 characters long');
+      setLoading(false);
+      return;
+    }
+
+    if (formData.username.length > 50) {
+      setError('Username must be 50 characters or less');
+      setLoading(false);
+      return;
+    }
+
+    if (formData.password.length < 6) {
+      setError('Password must be at least 6 characters long');
+      setLoading(false);
+      return;
+    }
+
+    if (formData.password.length > 128) {
+      setError('Password must be 128 characters or less');
+      setLoading(false);
+      return;
+    }
+
+    if (!formData.email.includes('@')) {
+      setError('Please enter a valid email address');
+      setLoading(false);
+      return;
+    }
+
     // Validate passwords match
     if (formData.password !== formData.confirmPassword) {
       setError('Passwords do not match');
@@ -87,8 +118,13 @@ function Signup() {
               name="username"
               value={formData.username}
               onChange={handleChange}
+              minLength="3"
+              maxLength="50"
               required
             />
+            <small style={{ color: '#666', fontSize: '0.8rem' }}>
+              Minimum 3 characters ({formData.username.length}/50)
+            </small>
           </div>
           
           <div className="form-group">
@@ -111,8 +147,13 @@ function Signup() {
               name="password"
               value={formData.password}
               onChange={handleChange}
+              minLength="6"
+              maxLength="128"
               required
             />
+            <small style={{ color: '#666', fontSize: '0.8rem' }}>
+              Minimum 6 characters ({formData.password.length}/128)
+            </small>
           </div>
           
           <div className="form-group">
