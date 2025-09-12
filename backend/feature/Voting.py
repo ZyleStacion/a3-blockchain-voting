@@ -1,6 +1,6 @@
 from typing import Dict, Any, List
 import uuid
-from db.database import proposals_collection, users_collection, votes_collection
+from db.database import proposals_collection, users_collection
 from blockchain.blockchain import Blockchain, Transactions
 import json
 import time
@@ -16,42 +16,61 @@ def calculate_hash(data_dict: Dict[str, Any]) -> str:
     block_string = json.dumps(data_dict, sort_keys=True).encode()
     return hashlib.sha256(block_string).hexdigest()
 
+
 async def create_vote_transaction(user_id: int, proposal_id: int, tickets: int):
-    # 1. Verify user exists and has enough tickets
+    # 1) Verify user & tickets
     user = await users_collection.find_one({"user_id": int(user_id)})
     if not user:
         return {"success": False, "message": f"User ID {user_id} not found."}
-    
+
     if user.get("voting_tickets", 0) < tickets:
         return {"success": False, "message": "Not enough voting tickets."}
 
-    # 2. Verify proposal exists
+    # 2) Verify proposal
     proposal = await proposals_collection.find_one({"proposal_id": int(proposal_id)})
     if not proposal:
         return {"success": False, "message": f"Proposal ID {proposal_id} not found."}
 
+    tx_id = f"vote_{user_id}_{proposal_id}_{tickets}"
+
+    vote_tx = Transactions(
+        transaction_id=tx_id,
+        sender=str(user_id),
+        receiver=str(proposal_id),
+        amount=tickets
+    )
+
+    # 4) Insert vote into blockchain pending pool
+    # insert_transaction() rejects duplicates or invalid txs:contentReference[oaicite:1]{index=1}
+    valid = blockchain.insert_transaction(vote_tx)
+    if not valid:
+        return {"success": False, "message": "Failed to insert vote transaction (duplicate or invalid)."}
+
+    # 5) Auto-mine a block that includes this vote
+    # auto_mine_block() mines with current pending txs and clears the pool on success:contentReference[oaicite:2]{index=2}
+    block = blockchain.auto_mine_block(data="Vote Block")
+    if not block:
+        # rollback pending tx if mining failed
+        blockchain.pending_transactions = [
+            tx for tx in blockchain.pending_transactions if tx.get("id") != tx_id
+        ]
+        return {"success": False, "message": "Failed to mine vote block."}
+
+    # 6) Deduct tickets ONLY AFTER block is successfully mined
     await users_collection.update_one(
         {"user_id": int(user_id)},
         {"$inc": {"voting_tickets": -tickets}}
     )
 
-    # 4. Record vote (for now: store in Mongo instead of blockchain)
-    vote_doc = {
-        "user_id": user_id,
-        "proposal_id": proposal_id,
-        "tickets_used": tickets
-    }
-    result = await votes_collection.insert_one(vote_doc)
-
-    if not result.inserted_id:
-        return {"success": False, "message": "Failed to insert vote transaction."}
+    # (optional) Persist chain so you can see it after restart:contentReference[oaicite:3]{index=3}
+    blockchain.save_chain()
 
     return {
         "success": True,
         "message": f"Vote recorded for proposal {proposal_id}",
-        "user_id": user_id,
-        "proposal_id": proposal_id,
-        "tickets_used": tickets
+        "block_index": block["index"],
+        "block_hash": block["hash"],
+        "transactions": block["transactions"]
     }
 
 

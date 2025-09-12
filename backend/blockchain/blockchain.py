@@ -4,15 +4,7 @@ import json
 
 class Block:
     def __init__(self, block_index, time_created, transactions, previous_hash, nonce):
-        """_summary_
-
-        Args:
-            block_index (_type_):  Index of the block
-            time_created (_type_): Timestamp of block create
-            transactions (_type_): Lists of transactions
-            previous_hash (_type_): Hash value from the previous blockj
-            nonce (_type_): The proof-of-work nonce that produced a valid block hash.
-        """
+       
         self.block_index = block_index
         self.time_created = time_created 
         self.transactions = transactions
@@ -21,9 +13,6 @@ class Block:
         self.nonce = nonce
 
     def to_dict(self) -> dict:
-        """
-        Return a serialize dictionary of block object
-        """
         return {
             "index": self.index,
             "timestamp": self.timestamp,
@@ -34,25 +23,12 @@ class Block:
     
 class Transactions:
     def __init__(self, transaction_id, sender, receiver, amount):
-        """
-        Initialize new tranasctions
-
-        Args:
-            transaction_id (_type_): Unique ID for transactions
-            sender (_type_):  The user or system creating/sending the transaction.
-            receiver (_type_): User receviing the transactions
-            amount (_type_): Amount sent
-        """
         self.ids = transaction_id
         self.sender = sender
         self.receiver = receiver
         self.amount = amount
     
     def to_dict(self):
-        """
-        Return a serializable dictionary of Transaction
-
-        """
         return {
             "id": self.ids,
             "sender": self.sender,
@@ -66,8 +42,7 @@ class Blockchain:
 
         self.chain = []
         self.pending_transactions = []
-        self.difficulty =3 # Default difficulty
-        
+        self.difficulty = 3  # initial difficulty level
         # Populate the block
         genesis_txs = [
               {
@@ -109,38 +84,27 @@ class Blockchain:
         return to_digest.encode()
     
     # Proof of work
-    def proof_of_work(self, previous_proof: int, index: int, data: str) -> int:
+    def proof_of_work(self, previous_proof: int, index: int, data: str, transactions: list = None) -> int:
         """
-        Perform the Proof-of-Work (PoW) algorithm to find a valid proof (nonce) 
-        for the next block in the blockchain.
-
-        The function repeatedly tests different values of `new_proof` until it 
-        finds one that produces a SHA-256 hash with the required number of leading 
-        zeros (difficulty target). This ensures that miners must expend 
-        computational effort to create a valid block, securing the blockchain 
-        against tampering.
-
-        Args:
-            previous_proof (int):Proof from previous block
-            index (int): Index of a block
-            data (str): The data of the block
-
-        Returns:
-            int: The valid proof (nonce) that satisfies the difficulty condition.
+        Simplified Proof-of-Work for DAO voting.
+        Ensures tamper resistance without requiring heavy mining.
         """
-        
+        if transactions is None:
+            transactions = []
+
         new_proof = 1
         while True:
-            # Generate candidate hash
-            to_digest = self.to_digest(new_proof, previous_proof, index, data)
+            # Include transactions so votes matter in PoW
+            tx_string = json.dumps(transactions, sort_keys=True)
+            to_digest = f"{new_proof}{previous_proof}{index}{data}{tx_string}".encode()
+
             hash_value = hashlib.sha256(to_digest).hexdigest()
 
-            # Stop if hash meets difficulty requirement
             if hash_value.startswith("0" * self.difficulty):
                 return new_proof
-            
-            # Increment nonce
+
             new_proof += 1
+
     
     #Adjust difficulty of mining
     def difficulty_adjustment(self):
@@ -151,8 +115,6 @@ class Blockchain:
         elif self.difficulty > 1 and len(self.chain) & 7 == 0:
             self.difficulty -= 1
             
-      
-    
     # Hash value
     def hash_value(self, block):
         """
@@ -174,60 +136,32 @@ class Blockchain:
         return hashlib.sha256(encoded_block).hexdigest()
                 
     # ---- Block ----
-    def mine_block(self, data: str, miner: str) -> dict: 
-        """
-        Mine a new block and add it into the blockchain.
+    def auto_mine_block(self, data: str = "Vote Block") -> dict:
+        if not self.pending_transactions:
+            return None
 
-        Args:
-            data (str): Data to include in the block
-            miner (str): User that mine the block
-
-        Returns:
-            dict: Dictionary of the created block
-            
-        - Proof-of-Work is a probabilistic process and may require 
-          thousands or millions of attempts before a valid proof 
-          is found.
-        - A mining reward transaction is automatically created and 
-          assigned to the miner.
-        - Pending transactions are cleared after being added to 
-          the block.
-          
-        """
-        
-        #Get previous block
         previous_block = self.get_previous_block()
         previous_proof = previous_block["proof"]
         index = previous_block["index"] + 1
-        
-        #Find valid proof
-        proof = self.proof_of_work(previous_proof, index, data)
-        
-        #When proof is found reward user 
-        reward_tx = {
-            "id": f"reward_{len(self.chain)+1}",  # unique reward ID
-            "sender": "SYSTEM",
-            "receiver": miner,
-            "amount": 10,  # reward amount
-        }
-        self.pending_transactions.append(reward_tx)
 
-        #Link preivous hash
+        proof = self.proof_of_work(previous_proof, index, data)
         previous_hash = self.hash_value(previous_block)
 
-        # Create the new block with reward + all pending transactions
         block = self.create_block(
             data=data,
             proof=proof,
             previous_hash=previous_hash,
             index=index
         )
-        
-        # Adjust difficulty
+
         self.difficulty_adjustment()
 
+        # 🟢 Save chain every time a block is mined
+        self.save_chain()
+
         return block
-    
+
+       
     # Create block
     def create_block(self, data: str, proof: int, previous_hash: str, index: int) -> dict:
         """Create a block within the blockchain
@@ -424,15 +358,6 @@ class Blockchain:
 
     #Validate transactions
     def validate_transaction(self, tx: dict) -> bool:
-        """
-        Validate transaction before adding
-
-        Args:
-            tx (dict): Dictionary format of the transaction
-
-        Returns:
-            bool: Return true if transaction is valid, if not false.
-        """
         sender = tx.get("sender")
         receiver = tx.get("receiver")
         amount = tx.get("amount")
@@ -448,10 +373,14 @@ class Blockchain:
         if amount < 0:
             return False
 
+        # Special case: votes (receiver is a proposal ID, not DAO_POOL)
+        if receiver.startswith("proposal_") or receiver.isdigit():
+            return True
+
+        # Normal donation/payment logic
         if sender != "SYSTEM" and receiver != "DAO_POOL":
             balance = self.get_balance(sender)
             if amount > balance:
                 return False
-
 
         return True
