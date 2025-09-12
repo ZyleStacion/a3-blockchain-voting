@@ -82,29 +82,50 @@ async def start_new_voting_period():
 async def finalize_voting():
     print("\nFinalizing voting period...")
     
-    # 1. fetch all temporary transactions
+    # 1. Get all pending transactions from the blockchain
     current_transactions = blockchain.pending_transactions
     if not current_transactions:
         print("No transactions to finalize.")
         
-    # 2. generate block and create chain
-    new_block = blockchain.mine_block(data="Final Vote Block", miner="SYSTEM")
-    blockchain.save_chain()
-    
-    # 3. finalize voting result
+    # 2. Count votes and store the first vote timestamp for each proposal
     vote_counts = {}
+    first_vote_timestamps = {}
     for tx in current_transactions:
         prop_id = tx.receiver
         tickets_cast = tx.amount
+        
+        # Count total tickets per proposal
         vote_counts[prop_id] = vote_counts.get(prop_id, 0) + tickets_cast
+        
+        # Record the timestamp of the first vote if it doesn't exist
+        if prop_id not in first_vote_timestamps:
+            first_vote_timestamps[prop_id] = tx.timestamp # Assuming Transactions has a timestamp
     
+    # 3. Handle the vote results
     if vote_counts:
-        winner_id = max(vote_counts, key=vote_counts.get)
+        # Get the maximum number of tickets
+        max_tickets = max(vote_counts.values())
+        
+        # Find all proposals that are tied with the max number of tickets
+        tied_proposals = [
+            prop_id for prop_id, count in vote_counts.items() 
+            if count == max_tickets
+        ]
+        
+        # 4. Determine the winner based on the tie-breaker rule
+        if len(tied_proposals) == 1:
+            # No tie, simply pick the single winner
+            winner_id = tied_proposals[0]
+        else:
+            # A tie exists, use the first-in rule
+            # Find the winner among tied proposals based on the earliest timestamp
+            winner_id = min(tied_proposals, key=lambda prop: first_vote_timestamps[prop])
+            
         settings_collection = get_settings_collection()
         voting_status = await settings_collection.find_one({"_id": "voting_status"})
         donation_amount = voting_status.get("donation_pot", 0)
 
-        # 4. Show result and reset donation status
+        # 5. Announce results and reset donation pot
         print(f"\n[Result] The winner of the vote is '{winner_id}'. A total of {donation_amount}$ will be donated.")
         
         await settings_collection.update_one(
@@ -112,7 +133,10 @@ async def finalize_voting():
             {"$set": {"donation_pot": 0}}
         )
     
-    # 5. Reset voting session status (is_voting_active to False로)
+    # 6. Finalize the blockchain and reset voting status
+    new_block = blockchain.mine_block(data="Final Vote Block", miner="SYSTEM")
+    blockchain.save_chain()
+    
     settings_collection = get_settings_collection()
     await settings_collection.update_one(
         {"_id": "voting_status"},
