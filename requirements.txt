@@ -3,7 +3,6 @@ uvicorn==0.30.1
 pydantic==2.8.2
 motor==3.4.0
 pymongo==4.6.1
-Pydantic
+PyJWT==2.8.0
 requests
 apscheduler
-# Cryptography?

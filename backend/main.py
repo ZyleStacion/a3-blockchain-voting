@@ -8,6 +8,7 @@ from vote import vote_router as vote_router
 from block import router as block_router
 from donation import donation_router as donation_router
 from blockchain.blockchain_singleton import blockchain
+import uvicorn
 
 # Set up
 app = FastAPI()
