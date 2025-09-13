@@ -72,7 +72,7 @@ function BuyTickets() {
         },
         body: JSON.stringify({
           user_id: userInfo.user_id,
-          amount: parseInt(formData.amount)
+          ticket_purchase: parseInt(formData.amount)
         })
       });
 
