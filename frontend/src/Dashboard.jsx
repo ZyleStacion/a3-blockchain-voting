@@ -5,12 +5,14 @@ import './Dashboard.css';
 function Dashboard() {
   const navigate = useNavigate();
   const [activeProposals, setActiveProposals] = useState([]);
+  const [userInfo, setUserInfo] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
   // Fetch active proposals when component loads
   useEffect(() => {
     fetchActiveProposals();
+    fetchUserInfo();
   }, []);
 
   const fetchActiveProposals = async () => {
@@ -26,6 +28,22 @@ function Dashboard() {
       console.error('Error fetching proposals:', err);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const fetchUserInfo = async () => {
+    try {
+      const response = await fetch('http://localhost:8000/auth/user-info', {
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('token')}`
+        }
+      });
+      if (response.ok) {
+        const user = await response.json();
+        setUserInfo(user);
+      }
+    } catch (err) {
+      console.error('Error fetching user info:', err);
     }
   };
 
@@ -49,6 +67,20 @@ function Dashboard() {
       </div>
       
       <div className="dashboard-content">
+        <div className="dashboard-card">
+          <h3>Your Account</h3>
+          {userInfo ? (
+            <div className="user-info">
+              <p><strong>Username:</strong> {userInfo.username}</p>
+              <p><strong>User ID:</strong> {userInfo.user_id || userInfo.id}</p>
+              <p><strong>Donation Balance:</strong> ${userInfo.donation_balance || 0}</p>
+              <p><strong>Voting Tickets:</strong> {userInfo.voting_tickets || 0}</p>
+            </div>
+          ) : (
+            <p>Please login/register to view your account information</p>
+          )}
+        </div>
+
         <div className="dashboard-card">
           <h3>Buy Tickets</h3>
           <p>Purchase voting tickets to participate in proposals.</p>

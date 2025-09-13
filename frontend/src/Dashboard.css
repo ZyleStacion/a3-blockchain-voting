@@ -2,7 +2,9 @@
   max-width: 1200px;
   margin: 0 auto;
   padding: 2rem;
-  min-height: 80vh;
+  padding-top: 10px;
+  padding-bottom: 3rem; /* Add bottom padding for better spacing */
+  min-height: calc(100vh - 120px); /* Adjust height to account for navbar */
 }
 
 .dashboard-header {
@@ -55,6 +57,31 @@
   color: #666;
   margin-bottom: 1.5rem;
   line-height: 1.6;
+}
+
+/* User info styling */
+.user-info {
+  text-align: left;
+  background: #f8f9fa;
+  padding: 1.5rem;
+  border-radius: 8px;
+  border: 1px solid #e9ecef;
+  margin-top: 1rem;
+}
+
+.user-info p {
+  margin: 0.5rem 0;
+  font-size: 1rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.user-info p strong {
+  color: #333;
+  font-weight: 600;
+  margin-right: 1rem;
+  min-width: 150px;
 }
 
 .dashboard-button {
