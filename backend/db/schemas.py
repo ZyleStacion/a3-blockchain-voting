@@ -15,6 +15,8 @@ class UserResponse(BaseModel):
     id: int
     username: str
     email: str   # <-- add this
+    donation_balance: Optional[float] = 100000.0
+    voting_tickets: Optional[int] = 0
     public_key: str
     
     class Config:
@@ -49,13 +51,13 @@ class TransactionResponse(BaseModel):
         form_mode = True
         
         
-#Ticket schema
+# Ticket schema
 class TicketPurchase(BaseModel):
-    user_id: str
+    user_id: int
     ticket_purchase: int
     
 class TicketResponse(BaseModel):
-    user_id: str
+    user_id: int
     ticket_purchase: int
     
     class Config:
@@ -77,11 +79,10 @@ class CreditPurchaseResponse(BaseModel):
         
 # Vote proposal schema
 class VoteProposalCreate(BaseModel):    
-        title: str
-        description: str    
-        options: list[str]  # e.g. ["yes", "no", "abstain"]
+    title: str
+    description: str    
+    options: list[str]  # e.g. ["yes", "no", "abstain"]
 
-    
 class VoteProposalResponse(BaseModel):
     id: int
     title: str
@@ -91,23 +92,28 @@ class VoteProposalResponse(BaseModel):
 class VoteSubmit(BaseModel):
     user_id: int
     proposal_id: int
+    tickets: int
 
     class Config:
         schema_extra = {
             "example": {
                 "user_id": 1,
-                "proposal_id": 1
+                "proposal_id": 1,
+                "tickets": 5
             }
         }
 #Donation schema
 class DonationCreate(BaseModel):
-    user_id: str
+    user_id: int
     amount: float
-class DonationResponse(BaseModel):
-    id: str
-    user_id: str
-    amount: float
-
+    message: str
     
+        
+class DonationResponse(BaseModel):
+    donation_id: int
+    user_id: int
+    amount: float
+    message: str = "Donation successful"
+
     class Config:
         form_mode = True

@@ -2,12 +2,12 @@
 from fastapi import FastAPI, APIRouter
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from db.save import load_data
-from vote import vote_router  
 from auth import router as auth_router
 from fastapi.middleware.cors import CORSMiddleware
 from vote import vote_router as vote_router
 from block import router as block_router
-
+from donation import donation_router as donation_router
+from blockchain.blockchain_singleton import blockchain
 
 # Set up
 app = FastAPI()
@@ -28,6 +28,13 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+try:
+    blockchain.load_chain()
+    print("Blockchain loaded from file.")
+except FileNotFoundError:
+    print("No existing blockchain file. Starting fresh.")
+    
 @router.get("/")
 def test_endpoint():
     return {"message": "Welcome to the Blockchain Voting API"}
@@ -35,6 +42,7 @@ def test_endpoint():
 # Include routers
 app.include_router(auth_router)
 app.include_router(vote_router)
+app.include_router(donation_router)
 app.include_router(block_router)
 
 # Status endpoint
@@ -42,3 +50,6 @@ app.include_router(block_router)
 async def get_status():
     data = load_data()
     return data
+
+if __name__ == "__main__": # Alow to be access from anywhere
+    uvicorn.run(app, host="0.0.0.0", port=8000)
