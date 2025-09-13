@@ -59,6 +59,14 @@ function Dashboard() {
     navigate(`/vote/${proposalId}`);
   };
 
+  const handleLogout = () => {
+    // Clear user data from localStorage
+    localStorage.removeItem('token');
+    localStorage.removeItem('user');
+    // Redirect to home page
+    navigate('/');
+  };
+
   return (
     <div className="dashboard-container">
       <div className="dashboard-header">
@@ -75,6 +83,9 @@ function Dashboard() {
               <p><strong>User ID:</strong> {userInfo.user_id || userInfo.id}</p>
               <p><strong>Donation Balance:</strong> ${userInfo.donation_balance || 0}</p>
               <p><strong>Voting Tickets:</strong> {userInfo.voting_tickets || 0}</p>
+              <button className="dashboard-button logout-btn" onClick={handleLogout}>
+                Logout
+              </button>
             </div>
           ) : (
             <p>Please login/register to view your account information</p>

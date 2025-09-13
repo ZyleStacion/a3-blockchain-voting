@@ -106,6 +106,17 @@
   transform: translateY(0);
 }
 
+.logout-btn {
+  background: linear-gradient(135deg, #dc3545, #c82333) !important;
+  margin-top: 1rem;
+  width: auto;
+  min-width: 120px;
+}
+
+.logout-btn:hover {
+  background: linear-gradient(135deg, #c82333, #a71e2a) !important;
+}
+
 @media (max-width: 768px) {
   .dashboard-container {
     padding: 1rem;
