@@ -28,3 +28,4 @@ dist-ssr
 
 # Database cache
 backend/db/__pycache__/*
+backend/__pycache__/*
