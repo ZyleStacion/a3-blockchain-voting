@@ -24,7 +24,7 @@ async def create_proposal_endpoint(request: VoteProposalCreate):
 
     # Build the document
     proposal_data = {
-        "_id": proposal_id,
+        "proposal_id": proposal_id,
         "title": request.title,
         "description": request.description,
         "options": request.options,

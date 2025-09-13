@@ -33,5 +33,22 @@
         "previous_hash": "24f71058a8b3ecb13eeac5fc48af294fea3dc4d601b68b22b05c3d4835e16882",
         "difficulty": 3,
         "hash": "adb10c7ef90907604a7ad8e1c31ec33a61e4737bccb5b6cf5f169f29a24703a5"
+    },
+    {
+        "index": 2,
+        "timestamp": "2025-09-13 13:51:10.334145",
+        "data": "Vote Block",
+        "transactions": [
+            {
+                "id": "vote_1_3_5",
+                "sender": "1",
+                "receiver": "3",
+                "amount": 5
+            }
+        ],
+        "proof": 4769,
+        "previous_hash": "adb10c7ef90907604a7ad8e1c31ec33a61e4737bccb5b6cf5f169f29a24703a5",
+        "difficulty": 3,
+        "hash": "6903b77bf296ecf3863ad9199fd4756ad53b6655a9a5c9031af5c26bc2b056f1"
     }
 ]
