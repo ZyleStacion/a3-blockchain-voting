@@ -6,8 +6,7 @@ function CreateProposal() {
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
     title: '',
-    description: '',
-    options: ['', '']
+    description: ''
   });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
@@ -19,44 +18,10 @@ function CreateProposal() {
     });
   };
 
-  const handleOptionChange = (index, value) => {
-    const newOptions = [...formData.options];
-    newOptions[index] = value;
-    setFormData({
-      ...formData,
-      options: newOptions
-    });
-  };
-
-  const addOption = () => {
-    setFormData({
-      ...formData,
-      options: [...formData.options, '']
-    });
-  };
-
-  const removeOption = (index) => {
-    if (formData.options.length > 2) {
-      const newOptions = formData.options.filter((_, i) => i !== index);
-      setFormData({
-        ...formData,
-        options: newOptions
-      });
-    }
-  };
-
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
     setError('');
-
-    // Validate options
-    const validOptions = formData.options.filter(option => option.trim() !== '');
-    if (validOptions.length < 2) {
-      setError('Please provide at least 2 options');
-      setLoading(false);
-      return;
-    }
 
     try {
       const response = await fetch('http://localhost:8000/vote/create-proposal', {
@@ -67,7 +32,7 @@ function CreateProposal() {
         body: JSON.stringify({
           title: formData.title,
           description: formData.description,
-          options: validOptions
+          options: ['Yes', 'No']
         })
       });
 
@@ -88,7 +53,7 @@ function CreateProposal() {
   };
 
   return (
-    <div className="auth-container">
+    <div className="auth-container" style={{ paddingTop: '200px' }}>
       <div className="auth-form" style={{ maxWidth: '600px' }}>
         <h2>Create New Proposal</h2>
         <p>Submit a new voting proposal for the community</p>
@@ -130,50 +95,18 @@ function CreateProposal() {
           </div>
           
           <div className="form-group">
-            <label>Voting Options:</label>
-            {formData.options.map((option, index) => (
-              <div key={index} style={{ display: 'flex', gap: '10px', marginBottom: '10px' }}>
-                <input
-                  type="text"
-                  placeholder={`Option ${index + 1}`}
-                  value={option}
-                  onChange={(e) => handleOptionChange(index, e.target.value)}
-                  style={{ flex: 1 }}
-                  required
-                />
-                {formData.options.length > 2 && (
-                  <button
-                    type="button"
-                    onClick={() => removeOption(index)}
-                    style={{
-                      background: '#dc3545',
-                      color: 'white',
-                      border: 'none',
-                      borderRadius: '4px',
-                      padding: '8px 12px',
-                      cursor: 'pointer'
-                    }}
-                  >
-                    Remove
-                  </button>
-                )}
-              </div>
-            ))}
-            <button
-              type="button"
-              onClick={addOption}
-              style={{
-                background: '#28a745',
-                color: 'white',
-                border: 'none',
-                borderRadius: '4px',
-                padding: '8px 16px',
-                cursor: 'pointer',
-                marginTop: '10px'
-              }}
-            >
-              Add Option
-            </button>
+            <label>Voting Type:</label>
+            <p style={{ 
+              background: '#f8f9fa',
+              padding: '15px',
+              borderRadius: '8px',
+              border: '2px solid #e1e5e9',
+              fontSize: '1rem',
+              margin: '10px 0',
+              textAlign: 'center'
+            }}>
+              This proposal will have <strong>Yes/No</strong> voting options
+            </p>
           </div>
           
           {error && <div className="error-message">{error}</div>}
