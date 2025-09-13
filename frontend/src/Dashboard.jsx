@@ -59,12 +59,29 @@ function Dashboard() {
     navigate(`/vote/${proposalId}`);
   };
 
-  const handleLogout = () => {
-    // Clear user data from localStorage
-    localStorage.removeItem('token');
-    localStorage.removeItem('user');
-    // Redirect to home page
-    navigate('/');
+  const handleLogout = async () => {
+    try {
+      // Call backend logout endpoint
+      const token = localStorage.getItem('token');
+      if (token) {
+        await fetch('http://localhost:8000/auth/logout', {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          }
+        });
+      }
+    } catch (error) {
+      console.error('Logout API call failed:', error);
+      // Continue with frontend logout even if API fails
+    } finally {
+      // Clear user data from localStorage
+      localStorage.removeItem('token');
+      localStorage.removeItem('user');
+      // Redirect to home page
+      navigate('/');
+    }
   };
 
   return (

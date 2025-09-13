@@ -12,12 +12,29 @@ function Navbar() {
         setIsLoggedIn(!!token);
     }, []);
 
-    const handleLogout = () => {
-        // Clear user data from localStorage
-        localStorage.removeItem('token');
-        localStorage.removeItem('user');
-        setIsLoggedIn(false);
-        navigate('/');
+    const handleLogout = async () => {
+        try {
+            // Call backend logout endpoint
+            const token = localStorage.getItem('token');
+            if (token) {
+                await fetch('http://localhost:8000/auth/logout', {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+            }
+        } catch (error) {
+            console.error('Logout API call failed:', error);
+            // Continue with frontend logout even if API fails
+        } finally {
+            // Clear user data from localStorage
+            localStorage.removeItem('token');
+            localStorage.removeItem('user');
+            setIsLoggedIn(false);
+            navigate('/');
+        }
     };
 
     return (
@@ -29,7 +46,7 @@ function Navbar() {
             </div>
             <ul className="navbar-links">
                 <li><Link to="/dashboard">Dashboard</Link></li>
-                <li><Link to="/signup">Register</Link></li>
+                {!isLoggedIn && <li><Link to="/signup">Register</Link></li>}
                 {isLoggedIn ? (
                     <li><button onClick={handleLogout} className="navbar-logout-btn">Logout</button></li>
                 ) : (
