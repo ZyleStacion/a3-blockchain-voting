@@ -25,3 +25,6 @@ dist-ssr
 
 # Virtual environment
 .venv/
+
+# Database cache
+backend/db/__pycache__/*
