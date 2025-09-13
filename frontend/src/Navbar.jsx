@@ -10,6 +10,15 @@ function Navbar() {
         // Check if user is logged in by checking for token
         const token = localStorage.getItem('token');
         setIsLoggedIn(!!token);
+        
+        // Listen for storage changes (when user logs in/out in another tab)
+        const handleStorageChange = () => {
+            const currentToken = localStorage.getItem('token');
+            setIsLoggedIn(!!currentToken);
+        };
+        
+        window.addEventListener('storage', handleStorageChange);
+        return () => window.removeEventListener('storage', handleStorageChange);
     }, []);
 
     const handleLogout = async () => {
@@ -47,11 +56,13 @@ function Navbar() {
             <ul className="navbar-links">
                 <li><Link to="/dashboard">Dashboard</Link></li>
                 {!isLoggedIn && <li><Link to="/signup">Register</Link></li>}
-                {isLoggedIn ? (
-                    <li><button onClick={handleLogout} className="navbar-logout-btn">Logout</button></li>
-                ) : (
-                    <li><Link to="/login">Login</Link></li>
-                )}
+                <li>
+                    {isLoggedIn ? (
+                        <button onClick={handleLogout} className="navbar-logout-btn">Logout</button>
+                    ) : (
+                        <Link to="/login">Login</Link>
+                    )}
+                </li>
             </ul>
         </nav>
     )
