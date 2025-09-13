@@ -2,102 +2,92 @@ from typing import Dict, Any, List
 import uuid
 from db.database import proposals_collection, users_collection
 from blockchain.blockchain import Blockchain, Transactions
+from blockchain.blockchain_singleton import blockchain
 import json
 import time
 import hashlib
 
-# These will now be handled by MongoDB logic.
-# from db.save import load_data, save_data, load_chain_data, save_chain_data
-
 THRESHOLD_AMOUNT = 1000
 VOTING_PERIOD_SECONDS = 300
 
-# Initialize global blockchain instance
-blockchain = Blockchain()
 
 def calculate_hash(data_dict: Dict[str, Any]) -> str:
     block_string = json.dumps(data_dict, sort_keys=True).encode()
     return hashlib.sha256(block_string).hexdigest()
 
-async def create_vote_transaction(user_id: str, proposal_id: str, tickets: int):
-    # This function now needs to reflect the new MongoDB data model.
-    # It should decrement the user's tickets and add a transaction.
-    
-    # 1. Verify user exists and has enough tickets
-    user = await users_collection.find_one({"_id": user_id})
+
+async def create_vote_transaction(user_id: int, proposal_id: int, tickets: int):
+    # 1) Verify user & tickets
+    user = await users_collection.find_one({"user_id": int(user_id)})
     if not user:
         return {"success": False, "message": f"User ID {user_id} not found."}
 
     if user.get("voting_tickets", 0) < tickets:
-        return {"success": False, "message": "Not enough tickets to vote."}
+        return {"success": False, "message": "Not enough voting tickets."}
 
-    # 2. Verify proposal exists
-    proposal = await proposals_collection.find_one({"_id": proposal_id})
+    # 2) Verify proposal
+    proposal = await proposals_collection.find_one({"proposal_id": int(proposal_id)})
     if not proposal:
         return {"success": False, "message": f"Proposal ID {proposal_id} not found."}
 
-    # 3. Decrement user's tickets
+    tx_id = f"vote_{user_id}_{proposal_id}_{tickets}"
+
+    vote_tx = Transactions(
+        transaction_id=tx_id,
+        sender=str(user_id),
+        receiver=str(proposal_id),
+        amount=tickets
+    )
+
+    # 4) Insert vote into blockchain pending pool
+    # insert_transaction() rejects duplicates or invalid txs:contentReference[oaicite:1]{index=1}
+    valid = blockchain.insert_transaction(vote_tx)
+    if not valid:
+        return {"success": False, "message": "Failed to insert vote transaction (duplicate or invalid)."}
+
+    # 5) Auto-mine a block that includes this vote
+    # auto_mine_block() mines with current pending txs and clears the pool on success:contentReference[oaicite:2]{index=2}
+    block = blockchain.auto_mine_block(data="Vote Block")
+    if not block:
+        # rollback pending tx if mining failed
+        blockchain.pending_transactions = [
+            tx for tx in blockchain.pending_transactions if tx.get("id") != tx_id
+        ]
+        return {"success": False, "message": "Failed to mine vote block."}
+
+    # 6) Deduct tickets ONLY AFTER block is successfully mined
     await users_collection.update_one(
-        {"_id": user_id},
+        {"user_id": int(user_id)},
         {"$inc": {"voting_tickets": -tickets}}
     )
 
-    # 4. Record vote on the blockchain
-    return record_vote_on_chain(
-        voter_pubkey=user.get("public_key", str(user_id)),
-        proposal_id=proposal_id,
-        tickets=tickets
-    )
+    # (optional) Persist chain so you can see it after restart:contentReference[oaicite:3]{index=3}
+    blockchain.save_chain()
 
-def start_new_voting_period():
-    # This logic now needs to be part of the ticket purchase process,
-    # and should be handled with a MongoDB update.
-    # The JSON-based load_data/save_data logic is obsolete.
-    pass
+    return {
+        "success": True,
+        "message": f"Vote recorded for proposal {proposal_id}",
+        "block_index": block["index"],
+        "block_hash": block["hash"],
+        "transactions": block["transactions"]
+    }
 
-async def finalize_voting():
-    # This entire function needs to be rewritten to use MongoDB.
-    # The JSON-based load/save functions are now obsolete.
-    pass
-
-async def check_and_finalize_voting_job():
-    # This function should check the MongoDB state, not a JSON file.
-    # We need to access the 'is_voting_active' and 'voting_period_start_time'
-    # fields from the MongoDB database, not a local file.
-    pass
 
 def record_vote_on_chain(voter_pubkey: str, proposal_id: str, tickets: int) -> dict:
-    """
-    Record a vote as a blockchain transaction.
-    
-    Args:
-        voter_pubkey (str): The voter's public key (pseudonymous identity).
-        proposal_id (str): The proposal the voter is voting on.
-        tickets (int): The number of tickets allocated.
-        
-    Returns:
-        dict: Transaction result with success flag and message.
-    """
-    # Create unique transaction ID
     tx_id = f"vote_{uuid.uuid4().hex[:10]}"
     
-    # Transaction format: sender = voter, receiver = proposal_id, amount = tickets
     tx = Transactions(
         transaction_id=tx_id,
         sender=voter_pubkey,
         receiver=proposal_id,
         amount=tickets
     )
-    
-    # Insert into blockchain's pending transactions
+
     success = blockchain.insert_transaction(tx)
     if not success:
         return {"success": False, "message": "Failed to insert vote transaction."}
 
-    # (Optional) Auto-mine a block every vote OR batch later
     block = blockchain.mine_block(data="Vote Block", miner="SYSTEM")
-
-    # Save blockchain state
     blockchain.save_chain()
 
     return {
@@ -107,3 +97,96 @@ def record_vote_on_chain(voter_pubkey: str, proposal_id: str, tickets: int) -> d
         "block_index": block["index"],
         "block_hash": block["hash"]
     }
+
+# --- Logic for using MongoDB ---
+
+async def start_new_voting_period():
+    settings_collection = get_settings_collection()
+    # update vote status on mongoDB and record time
+    await settings_collection.update_one(
+        {"_id": "voting_status"},
+        {"$set": {"is_voting_active": True, "voting_period_start_time": time.time()}},
+        upsert=True
+    )
+    # Donation pot is checked on ticket purchase, might not be needed here.
+    print("Pot has reached overflow threshold. Initiating vote.")
+    return {"message": "New voting period has started."}
+
+
+async def finalize_voting():
+    print("\nFinalizing voting period...")
+    
+    # 1. Get all pending transactions from the blockchain
+    current_transactions = blockchain.pending_transactions
+    if not current_transactions:
+        print("No transactions to finalize.")
+        
+    # 2. Count votes and store the first vote timestamp for each proposal
+    vote_counts = {}
+    first_vote_timestamps = {}
+    for tx in current_transactions:
+        prop_id = tx.receiver
+        tickets_cast = tx.amount
+        
+        # Count total tickets per proposal
+        vote_counts[prop_id] = vote_counts.get(prop_id, 0) + tickets_cast
+        
+        # Record the timestamp of the first vote if it doesn't exist
+        if prop_id not in first_vote_timestamps:
+            first_vote_timestamps[prop_id] = tx.timestamp # Assuming Transactions has a timestamp
+    
+    # 3. Handle the vote results
+    if vote_counts:
+        # Get the maximum number of tickets
+        max_tickets = max(vote_counts.values())
+        
+        # Find all proposals that are tied with the max number of tickets
+        tied_proposals = [
+            prop_id for prop_id, count in vote_counts.items() 
+            if count == max_tickets
+        ]
+        
+        # 4. Determine the winner based on the tie-breaker rule
+        if len(tied_proposals) == 1:
+            # No tie, simply pick the single winner
+            winner_id = tied_proposals[0]
+        else:
+            # A tie exists, use the first-in rule
+            # Find the winner among tied proposals based on the earliest timestamp
+            winner_id = min(tied_proposals, key=lambda prop: first_vote_timestamps[prop])
+            
+        settings_collection = get_settings_collection()
+        voting_status = await settings_collection.find_one({"_id": "voting_status"})
+        donation_amount = voting_status.get("donation_pot", 0)
+
+        # 5. Announce results and reset donation pot
+        print(f"\n[Result] The winner of the vote is '{winner_id}'. A total of {donation_amount}$ will be donated.")
+        
+        await settings_collection.update_one(
+            {"_id": "voting_status"},
+            {"$set": {"donation_pot": 0}}
+        )
+    
+    # 6. Finalize the blockchain and reset voting status
+    new_block = blockchain.mine_block(data="Final Vote Block", miner="SYSTEM")
+    blockchain.save_chain()
+    
+    settings_collection = get_settings_collection()
+    await settings_collection.update_one(
+        {"_id": "voting_status"},
+        {"$set": {"is_voting_active": False, "voting_period_start_time": None}}
+    )
+    
+    print("Votes were concluded and blocks were created.")
+    return {"message": "Voting finalized and results recorded."}
+
+
+async def check_and_finalize_voting_job():
+    settings_collection = get_settings_collection()
+    voting_status = await settings_collection.find_one({"_id": "voting_status"})
+    
+    if voting_status and voting_status.get("is_voting_active"):
+        start_time = voting_status.get("voting_period_start_time")
+        if start_time and (time.time() - start_time) >= VOTING_PERIOD_SECONDS:
+            print("\nVoting period has ended. Finalizing votes...")
+            await finalize_voting()

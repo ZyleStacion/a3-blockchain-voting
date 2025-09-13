@@ -1,12 +1,10 @@
 from fastapi import APIRouter, Form, HTTPException
 from pydantic import BaseModel
-from fastapi.middleware.cors import CORSMiddleware
-from blockchain.blockchain import  Transactions
+from blockchain.blockchain import Transactions
 from blockchain.blockchain_singleton import blockchain  
 
 # Router setup
 router = APIRouter(prefix="/blockchain", tags=["Blockchain"])
-
 
 # --- Models ---
 class GetTransactions(BaseModel):
@@ -33,33 +31,28 @@ def get_blockchain_data():
     }
 
 
-# Get single block by index
-@router.get("/blockchain/{index}")
-def get_single_block(index: int):
-    if index < 0 or index >= len(blockchain.chain):
-        raise HTTPException(status_code=404, detail="Block not found")
-    return blockchain.chain[index]
-
-
 # Mine block
 @router.post("/mine_block/")
-def mine_block(data: str, miner: str):
+def mine_block(data: str = "Vote Block"):
     if not blockchain.is_chain_valid():
         raise HTTPException(status_code=400, detail="Invalid Blockchain")
 
-    block = blockchain.mine_block(data=data, miner=miner)
-    return {"message": f"Block mined by {miner}!", "block": block}
+    block = blockchain.auto_mine_block(data=data)
+    if not block:
+        raise HTTPException(status_code=400, detail="No pending transactions to mine")
+
+    return {"message": "Block auto-mined!", "block": block}
 
 
 # --- Transactions ---
 
-# Create transaction
-@router.post("/create_transactions")
-def create_transactions_form(
-    id: str = Form(..., description="Transaction ID, e.g. tx001"),
-    sender: str = Form(..., description="Sender name, e.g. Alice"),
-    receiver: str = Form(..., description="Receiver name, e.g. Bob"),
-    amount: float = Form(..., description="Amount, e.g. 100"),
+# Create Vote transaction
+@router.post("/create_vote_transaction")
+def create_vote_transaction(
+    id: str = Form(...),
+    sender: str = Form(...),
+    receiver: str = Form(...),
+    amount: float = Form(...)
 ):
     trans = Transactions(
         transaction_id=id,
@@ -72,27 +65,13 @@ def create_transactions_form(
     if not valid:
         raise HTTPException(status_code=400, detail="Invalid Transaction")
 
+    # Auto-mine right after transaction is added
+    block = blockchain.auto_mine_block(data="Vote Block")
+
     return {
         "accepted": True,
-        "size": len(blockchain.pending_transactions),
+        "block_mined": bool(block),
+        "block": block,
+        "chain_length": len(blockchain.chain),
     }
-
-
-# Get pending transactions
-@router.get("/pending_transactions")
-def get_pending_transactions():
-    return {
-        "pending_transactions": blockchain.pending_transactions,
-        "count": len(blockchain.pending_transactions),
-    }
-
-
-# Get balance of a user
-@router.get("/balance/{user}")
-def get_balance(user: str):
-    if not user:
-        raise HTTPException(status_code=400, detail="No user")
-
-    balance = blockchain.get_balance(user)
-    return {"user": user, "balance": balance}
 

@@ -1,7 +1,7 @@
 [
     {
         "index": 0,
-        "timestamp": "2025-09-08 22:00:33.293824",
+        "timestamp": "2025-09-12 08:37:59.585660",
         "data": "Genesis Block",
         "transactions": [
             {
@@ -15,31 +15,23 @@
         "proof": 1,
         "previous_hash": "0",
         "difficulty": 3,
-        "none": 1,
-        "hash": "f7a307dac183409b4583d5a7d2a89593c1ea796cf8c121dd2fcb605696ac1d00"
+        "hash": "24f71058a8b3ecb13eeac5fc48af294fea3dc4d601b68b22b05c3d4835e16882"
     },
     {
         "index": 1,
-        "timestamp": "2025-09-08 22:00:37.795246",
-        "data": "Vote",
+        "timestamp": "2025-09-12 15:38:09.100839",
+        "data": "Vote Block",
         "transactions": [
             {
-                "id": "vote_4e2de69fab",
-                "sender": "-----BEGIN PUBLIC KEY-----\nMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA0au/Hp2uxExPVKWrRwYs\nMjRqxbBUkg6G2NXsMORQQP1eV9CY0qKKqftDxOlZ3jdQ99a5IGnqGKeJ2/U5jmsB\nwhMIWK7jTWCE72snfLMmXdyr2akTIvswrb0laopxRVyjZDIQonDtoCq8krXb7Mp/\n7RvkuFk/sc8ygEPox947ONYAeKGp0tY14IT2EP3P6DTCjHetA+Ce5BVpBaUFSrvm\nEOML5gzamn/oWaBll/DjPirNAuT3sHsbcuBq0Rp5G/I2BAxm6FwyiVoWrKTqDigC\nRvk2CU1c3xMB360iV0stnPSG5EyVZz2kkP/4nipfNzvNS3D+NPx0+vE2MprqgTHP\nCwIDAQAB\n-----END PUBLIC KEY-----\n",
+                "id": "vote_1_1_5",
+                "sender": "1",
                 "receiver": "1",
-                "amount": 0
-            },
-            {
-                "id": "reward_2",
-                "sender": "SYSTEM",
-                "receiver": "SYSTEM",
-                "amount": 10
+                "amount": 5
             }
         ],
-        "proof": 7759,
-        "previous_hash": "1937adbc281508bae55468f6678f9b398b5775cd73e3e99f10dc4253c008c02b",
+        "proof": 1314,
+        "previous_hash": "24f71058a8b3ecb13eeac5fc48af294fea3dc4d601b68b22b05c3d4835e16882",
         "difficulty": 3,
-        "none": 7759,
-        "hash": "59a542086eae092b78e690c90e1b39cf6500cc3842a16ef3e812438554d9064c"
+        "hash": "adb10c7ef90907604a7ad8e1c31ec33a61e4737bccb5b6cf5f169f29a24703a5"
     }
 ]
