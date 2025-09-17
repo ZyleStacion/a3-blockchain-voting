@@ -51,4 +51,4 @@ async def submit_vote_endpoint(request: VoteSubmit):
         user_id=request.user_id,
         proposal_id=request.proposal_id,
         tickets=request.tickets
-    )
+    )   
