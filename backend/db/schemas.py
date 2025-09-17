@@ -20,7 +20,7 @@ class UserResponse(BaseModel):
     public_key: str
     
     class Config:
-        orm_mode = True
+        form_mode = True
 
 # Vote schema
 class VoteCreate(BaseModel):
@@ -48,7 +48,7 @@ class TransactionResponse(BaseModel):
     timestamp: str  # ISO format
     
     class Config:
-        orm_mode = True
+        form_mode = True
         
         
 # Ticket schema
@@ -61,7 +61,7 @@ class TicketResponse(BaseModel):
     ticket_purchase: int
     
     class Config:
-        orm_mode = True
+        form_mode = True
     
 # Credit purchase schema
 class CreditPurchase(BaseModel):
@@ -74,7 +74,7 @@ class CreditPurchaseResponse(BaseModel):
 
     
     class Config:
-        orm_mode = True
+        form_mode = True
         
         
 # Vote proposal schema
@@ -116,26 +116,4 @@ class DonationResponse(BaseModel):
     message: str = "Donation successful"
 
     class Config:
-         schema_extra = {
-            "example": {
-                "user_id": 1,
-                "amount": 1,
-                "message": "Donation for a good cause"
-            }
-        }
-         
-
-# Charity schema
-class CharityCreate(BaseModel):
-    name: str
-    description: Optional[str] = None
-    contact_email: Optional[str] = None
-    
-class CharityResponseModel(BaseModel):
-    id: int
-    name: str
-    description: Optional[str] = None
-    contact_email: Optional[str] = None
-
-    class Config:
-        orm_mode = True
+        form_mode = True
