@@ -33,7 +33,7 @@ async def add_charity(request: CharityCreate):
     }
 
 
-@charity_router.get("/get_all")
+@charity_router.get("/get-all")
 async def get_all_charities():
     charities = []
     async for charity in charities_collection.find():
