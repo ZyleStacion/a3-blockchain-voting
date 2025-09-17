@@ -7,18 +7,37 @@ function Navbar() {
     const [isLoggedIn, setIsLoggedIn] = useState(false);
 
     useEffect(() => {
-        // Check if user is logged in by checking for token
-        const token = localStorage.getItem('token');
-        setIsLoggedIn(!!token);
+        // Function to check authentication status
+        const checkAuthStatus = () => {
+            const token = localStorage.getItem('token');
+            setIsLoggedIn(!!token);
+        };
+
+        // Initial check
+        checkAuthStatus();
         
         // Listen for storage changes (when user logs in/out in another tab)
         const handleStorageChange = () => {
-            const currentToken = localStorage.getItem('token');
-            setIsLoggedIn(!!currentToken);
+            checkAuthStatus();
         };
         
+        // Listen for custom auth events (for same-tab login/logout)
+        const handleAuthChange = () => {
+            checkAuthStatus();
+        };
+
+        // Add event listeners
         window.addEventListener('storage', handleStorageChange);
-        return () => window.removeEventListener('storage', handleStorageChange);
+        window.addEventListener('authStateChanged', handleAuthChange);
+        
+        // Check auth status periodically as a fallback
+        const authCheckInterval = setInterval(checkAuthStatus, 1000);
+        
+        return () => {
+            window.removeEventListener('storage', handleStorageChange);
+            window.removeEventListener('authStateChanged', handleAuthChange);
+            clearInterval(authCheckInterval);
+        };
     }, []);
 
     const handleLogout = async () => {
@@ -42,6 +61,10 @@ function Navbar() {
             localStorage.removeItem('token');
             localStorage.removeItem('user');
             setIsLoggedIn(false);
+            
+            // Dispatch custom event to notify other components
+            window.dispatchEvent(new Event('authStateChanged'));
+            
             navigate('/');
         }
     };

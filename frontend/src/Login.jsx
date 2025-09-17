@@ -62,6 +62,9 @@ function Login() {
       localStorage.setItem('user', JSON.stringify(data));
       console.log('User data saved to localStorage');
 
+      // Dispatch custom event to notify navbar of auth state change
+      window.dispatchEvent(new Event('authStateChanged'));
+
       // Redirect to dashboard
       console.log('Redirecting to dashboard...');
       navigate('/dashboard');

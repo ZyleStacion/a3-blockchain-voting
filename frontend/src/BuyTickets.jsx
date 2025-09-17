@@ -12,6 +12,11 @@ function BuyTickets() {
   const [success, setSuccess] = useState('');
   const [userInfo, setUserInfo] = useState(null);
 
+  // Calculate quadratic voting cost (same as backend)
+  const calculateQVCost = (tickets) => {
+    return tickets ** 2;
+  };
+
   // Fetch user info when component loads
   useEffect(() => {
     fetchUserInfo();
@@ -84,6 +89,19 @@ function BuyTickets() {
       const result = await response.json();
       setSuccess(`Successfully purchased ${formData.amount} tickets!`);
       
+      // TODO: Add function to refresh user balance after ticket purchase
+      // Update the user info to reflect new balances from the response
+      if (result.remaining_balance !== undefined && result.total_tickets !== undefined) {
+        setUserInfo(prevInfo => ({
+          ...prevInfo,
+          donation_balance: result.remaining_balance,
+          voting_tickets: result.total_tickets
+        }));
+      } else {
+        // Fallback: refresh user info from backend
+        await fetchUserInfo();
+      }
+      
       setTimeout(() => {
         navigate('/dashboard');
       }, 2000);
@@ -105,6 +123,18 @@ function BuyTickets() {
           <div className="user-info" style={{ marginBottom: '1rem', padding: '0.5rem', backgroundColor: '#f0f8ff', borderRadius: '5px' }}>
             <p><strong>Buying tickets for:</strong> {userInfo.username} (ID: {userInfo.user_id})</p>
             <p><strong>Current tickets:</strong> {userInfo.voting_tickets || 0}</p>
+            <p><strong>Current balance:</strong> ${userInfo.donation_balance || 0}</p>
+            {formData.amount && (
+              <>
+                <p><strong>Cost for {formData.amount} ticket{formData.amount > 1 ? 's' : ''}:</strong> ${calculateQVCost(parseInt(formData.amount))} (Quadratic Voting: {formData.amount}² = {calculateQVCost(parseInt(formData.amount))})</p>
+                <p><strong>Balance after purchase:</strong> ${(userInfo.donation_balance || 0) - calculateQVCost(parseInt(formData.amount))}</p>
+              </>
+            )}
+            {userInfo.donation_balance < calculateQVCost(parseInt(formData.amount || 1)) && (
+              <p style={{ color: '#e74c3c', fontWeight: 'bold' }}>
+                ⚠️ Insufficient balance! You need ${calculateQVCost(parseInt(formData.amount || 1)) - userInfo.donation_balance} more credits.
+              </p>
+            )}
           </div>
         )}
         
@@ -130,9 +160,17 @@ function BuyTickets() {
           <button 
             type="submit" 
             className="auth-button"
-            disabled={loading || !userInfo}
+            disabled={
+              loading || 
+              !userInfo || 
+              (userInfo && userInfo.donation_balance < calculateQVCost(parseInt(formData.amount || 1)))
+            }
           >
-            {loading ? 'Processing...' : `Buy ${formData.amount} Ticket${formData.amount > 1 ? 's' : ''}`}
+            {loading ? 'Processing...' : 
+             (userInfo && userInfo.donation_balance < calculateQVCost(parseInt(formData.amount || 1))) ? 
+             'Insufficient Balance' : 
+             `Buy ${formData.amount} Ticket${formData.amount > 1 ? 's' : ''} ($${calculateQVCost(parseInt(formData.amount || 1))})`
+            }
           </button>
         </form>
         

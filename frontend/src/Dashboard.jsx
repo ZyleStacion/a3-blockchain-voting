@@ -79,6 +79,10 @@ function Dashboard() {
       // Clear user data from localStorage
       localStorage.removeItem('token');
       localStorage.removeItem('user');
+      
+      // Dispatch custom event to notify navbar and other components
+      window.dispatchEvent(new Event('authStateChanged'));
+      
       // Redirect to home page
       navigate('/');
     }

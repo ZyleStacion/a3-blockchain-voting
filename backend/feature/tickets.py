@@ -44,6 +44,20 @@ async def buy_tickets(purchase: TicketPurchase) -> dict:
         "success": True,
         "message": f"Purchased {ticket_purchase} tickets.",
         "user_id": purchase.user_id,
-        "tickets_purchased": ticket_purchase
+        "tickets_purchased": ticket_purchase,
+        "remaining_balance": donation_balance - cost,  # Include updated balance in response
+        "total_tickets": user.get("voting_tickets", 0) + ticket_purchase
     }
+
+# TODO: Add function to get current user balance and tickets
+# async def get_user_balance(user_id: int) -> dict:
+#     """Get current user balance and ticket count"""
+#     user = await users_collection.find_one({"user_id": user_id})
+#     if not user:
+#         return {"success": False, "message": "User not found"}
+#     return {
+#         "success": True,
+#         "donation_balance": user.get("donation_balance", 0),
+#         "voting_tickets": user.get("voting_tickets", 0)
+#     }
 
