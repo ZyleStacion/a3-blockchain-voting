@@ -24,18 +24,18 @@ class Block:
 
 
 class Transactions:
-    def __init__(self, transaction_id, sender, receiver, amount):
+    def __init__(self, transaction_id, sender, charity_receive, ticket_sent):
         self.ids = transaction_id
         self.sender = sender
-        self.receiver = receiver
-        self.amount = amount
+        self.charity_receive = charity_receive
+        self.ticket_sent = ticket_sent
     
     def to_dict(self):
         return {
             "id": self.ids,
             "sender": self.sender,
-            "receiver": self.receiver,
-            "amount": self.amount,
+            "charity_receive": self.charity_receive,
+            "ticket_sent": self.ticket_sent,
         }    
 
 class Blockchain: 
@@ -49,8 +49,8 @@ class Blockchain:
             {
                 "id": "genesis_tx_0",
                 "sender": "SYSTEM",
-                "receiver": "DAO_POOL",
-                "amount": 0,
+                "charity_receive": "DAO_POOL",
+                "ticket_sent": 0,
                 "description": "Genesis block for DAO voting and donation system"
             }
         ]
@@ -240,43 +240,6 @@ class Blockchain:
         with open("blockchain.json", "r") as f:
              self.chain = json.load(f)
 
-    # ---- TRANSACTIONS ----
-    def get_balance(self, user: str) -> float:
-        """
-        A helper functions to get user's balance
-
-        Args:
-            user (str): Input user name
-        Returns:
-            float: Return the balance number of in
-        """
-        balance = 0.0
-
-        # Confirmed transactions
-        for block in self.chain:
-            for tx in block["transactions"]:
-                sender = tx.get("sender")
-                receiver = tx.get("receiver")
-                amount = tx.get("amount", 0)  
-
-                if sender == user:
-                    balance -= amount
-                if receiver == user:
-                    balance += amount
-
-        # Pending transactions
-        for tx in self.pending_transactions:
-            sender = tx.get("sender")
-            receiver = tx.get("receiver")
-            amount = tx.get("amount", 0)
-
-            if sender == user:
-                balance -= amount
-            if receiver == user:
-                balance += amount
-
-        return balance
-
     #Check transactions
     def check_transactions(self, tx_id: str) -> bool: # 
         """
@@ -337,28 +300,31 @@ class Blockchain:
     #Validate transactions
     def validate_transaction(self, tx: dict) -> bool:
         sender = tx.get("sender")
-        receiver = tx.get("receiver")
-        amount = tx.get("amount")
+        charity_receive = tx.get("charity_receive")
+        ticket_sent = tx.get("ticket_sent")
 
-        if not sender or not receiver or amount is None:
+        if not sender or charity_receive is None or ticket_sent is None:
             return False
 
         try:
-            amount = float(amount)
+            ticket_sent = int(ticket_sent)
         except (TypeError, ValueError):
             return False
 
-        if amount < 0:
+        if ticket_sent < 0:
             return False
 
-        # Special case: votes (receiver is a proposal ID, not DAO_POOL)
-        if receiver.startswith("proposal_") or receiver.isdigit():
+        # Ensure charity_receive is string before checks
+        charity_str = str(charity_receive)
+
+        # Special case: votes (proposal IDs allowed)
+        if charity_str.startswith("proposal_") or charity_str.isdigit():
             return True
 
         # Normal donation/payment logic
-        if sender != "SYSTEM" and receiver != "DAO_POOL":
+        if sender != "SYSTEM" and charity_str != "DAO_POOL":
             balance = self.get_balance(sender)
-            if amount > balance:
+            if ticket_sent > balance:
                 return False
 
         return True

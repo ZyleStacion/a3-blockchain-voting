@@ -34,9 +34,9 @@ async def create_vote_transaction(user_id: int, proposal_id: int, tickets: int):
 
     vote_tx = Transactions(
         transaction_id=tx_id,
-        sender=str(user_id),
-        receiver=str(proposal_id),
-        amount=tickets
+        sender=int(user_id),
+        charity_receive=int(proposal_id),
+        ticket_sent=tickets
     )
 
     # 4) Insert vote into blockchain pending pool

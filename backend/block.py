@@ -31,19 +31,6 @@ def get_blockchain_data():
     }
 
 
-# Mine block
-# @router.post("/mine_block/")
-# def mine_block(data: str = "Vote Block"):
-#     if not blockchain.is_chain_valid():
-#         raise HTTPException(status_code=400, detail="Invalid Blockchain")
-
-#     block = blockchain.auto_mine_block(data=data)
-#     if not block:
-#         raise HTTPException(status_code=400, detail="No pending transactions to mine")
-
-#     return {"message": "Block auto-mined!", "block": block}
-
-
 # --- Transactions ---
 
 # Create Vote transaction
@@ -51,14 +38,14 @@ def get_blockchain_data():
 def create_vote_transaction(
     id: str = Form(...),
     sender: str = Form(...),
-    receiver: str = Form(...),
-    amount: float = Form(...)
+    charity_receive: str = Form(...),
+    ticket_sent: int = Form(...)
 ):
     trans = Transactions(
         transaction_id=id,
         sender=sender,
-        receiver=receiver,
-        amount=amount,
+        charity_receive=charity_receive,
+        ticket_sent=ticket_sent,
     )
 
     valid = blockchain.insert_transaction(trans)

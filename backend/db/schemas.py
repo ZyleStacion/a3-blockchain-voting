@@ -95,7 +95,6 @@ class VoteSubmit(BaseModel):
     proposal_id: int
     tickets: int
     
-
     class Config:
         schema_extra = {
             "example": {
