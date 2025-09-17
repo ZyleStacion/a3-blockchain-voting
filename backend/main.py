@@ -9,6 +9,7 @@ from block import router as block_router
 from donation import donation_router as donation_router
 from blockchain.blockchain_singleton import blockchain
 from charity import charity_router as charity_router
+import uvicorn
 
 # Set up
 app = FastAPI()
