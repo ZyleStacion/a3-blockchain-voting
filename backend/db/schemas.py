@@ -132,12 +132,23 @@ class CharityCreate(BaseModel):
     name: str
     description: Optional[str] = None
     contact_email: Optional[str] = None
-    
+    open_time: Optional[str] = None   # ISO 8601 string, e.g. "2025-09-17T17:00:00"
+    close_time: Optional[str] = None  # ISO 8601 string, e.g. "2025-09-17T18:00:00"
+
+
+class CharityUpdate(BaseModel):
+    open_time: Optional[str] = None
+    close_time: Optional[str] = None   
+
+
 class CharityResponseModel(BaseModel):
     id: int
     name: str
     description: Optional[str] = None
     contact_email: Optional[str] = None
+    open_time: Optional[str] = None
+    close_time: Optional[str] = None
+    status: Optional[str] = None
 
     class Config:
         orm_mode = True

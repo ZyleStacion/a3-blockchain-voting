@@ -18,29 +18,35 @@ function Dashboard() {
     fetchUserInfo();
   }, []);
 
-  const fetchActiveProposals = async () => {
-    try {
-      setLoading(true);
-      const response = await fetch('http://localhost:8000/charities/get-all');
-      if (response.ok) {
-        const data = await response.json();
-        // Map charity data to proposals format for compatibility
-        const charityProposals = data.charities.map(charity => ({
-          _id: charity.id,
-          proposal_id: charity.id,
-          title: charity.name,
-          description: charity.description,
-          contact_email: charity.contact_email
-        }));
-        setActiveProposals(charityProposals);
-      }
-    } catch (err) {
-      setError('Failed to fetch active proposals');
-      console.error('Error fetching proposals:', err);
-    } finally {
-      setLoading(false);
+const fetchActiveProposals = async () => {
+  try {
+    setLoading(true);
+    const response = await fetch('http://localhost:8000/charities/get-active');  
+    if (response.ok) {
+      const data = await response.json();
+      // Map charity data to proposals format for compatibility
+      const charityProposals = data.charities.map(charity => ({
+        _id: charity.id,
+        proposal_id: charity.id,
+        title: charity.name,
+        description: charity.description,
+        contact_email: charity.contact_email,
+        status: charity.status,         // NEW: include status
+        open_time: charity.open_time,   // NEW: include open time
+        close_time: charity.close_time  // NEW: include close time
+      }));
+      setActiveProposals(charityProposals);
+    } else {
+      setActiveProposals([]);
     }
-  };
+  } catch (err) {
+    setError('Failed to fetch active charities');
+    console.error('Error fetching charities:', err);
+    setActiveProposals([]);
+  } finally {
+    setLoading(false);
+  }
+};
 
   const fetchUserInfo = async () => {
     try {

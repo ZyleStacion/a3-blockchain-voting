@@ -1,9 +1,9 @@
-# backend/vote.py
 from fastapi import APIRouter, HTTPException
 from feature.tickets import buy_tickets
 from feature.voting import create_vote_transaction
 from db.schemas import TicketPurchase, VoteProposalCreate, VoteSubmit
 from db.database import proposals_collection, get_next_proposal_id, charities_collection
+from datetime import datetime
 
 vote_router = APIRouter(prefix="/vote", tags=["Vote"])
 
@@ -17,7 +17,7 @@ async def buy_tickets_endpoint(request: TicketPurchase):
 
     return result
 
-    
+
 @vote_router.post("/create-proposal")
 async def create_proposal_endpoint(request: VoteProposalCreate):
     proposal_id = await get_next_proposal_id()
@@ -36,7 +36,7 @@ async def create_proposal_endpoint(request: VoteProposalCreate):
         "charity": {   # ✅ embed charity reference
             "charity_id": charity["charity_id"],
             "name": charity["name"],
-            "email": charity["email"]
+            "contact_email": charity.get("contact_email")
         }
     }
 
@@ -52,6 +52,7 @@ async def create_proposal_endpoint(request: VoteProposalCreate):
         "message": f"Proposal '{request.title}' created successfully for charity '{charity['name']}'."
     }
 
+
 @vote_router.post("/submit-vote")
 async def submit_vote_endpoint(request: VoteSubmit):
     # Pass the 'tickets' field from the request body
@@ -60,13 +61,43 @@ async def submit_vote_endpoint(request: VoteSubmit):
         proposal_id=request.proposal_id,
         tickets=request.tickets
     )
+
+
+async def update_charity_status(charity: dict):
+    """Check open/close window and update status dynamically"""
+    now = datetime.utcnow()
+
+    try:
+        open_time = datetime.fromisoformat(charity["open_time"])
+        close_time = datetime.fromisoformat(charity["close_time"])
+    except Exception:
+        return charity  # skip if invalid or missing times
+
+    if not charity.get("session_consumed", False):
+        if open_time <= now <= close_time:
+            charity["status"] = "Open"
+        elif now > close_time:
+            charity["status"] = "Closed"
+            charity["session_consumed"] = True
+            await charities_collection.update_one(
+                {"charity_id": charity["charity_id"]},
+                {"$set": {"status": "Closed", "session_consumed": True}}
+            )
+    return charity
+
+
 @vote_router.get("/active-proposals")
 async def get_active_proposals():
-    """Get all active voting proposals"""
+    """Get proposals linked to currently open charities"""
     try:
-        # Exclude `_id` so results are JSON-serializable
-        cursor = proposals_collection.find({}, {"_id": 0})
-        proposals = await cursor.to_list(length=None)  # None = fetch everything
+        proposals = []
+        async for proposal in proposals_collection.find({}, {"_id": 0}):
+            charity = await charities_collection.find_one({"charity_id": proposal["charity"]["charity_id"]})
+            if charity:
+                charity = await update_charity_status(charity)
+                if charity["status"] == "Open":
+                    proposals.append(proposal)
+
         return {
             "success": True,
             "count": len(proposals),
