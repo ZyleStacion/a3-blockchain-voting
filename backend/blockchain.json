@@ -118,5 +118,39 @@
         "previous_hash": "69bfdbfee15a636b6316195cb9c045a0cc7105a616a48a6ea3cacde1b64b9980",
         "difficulty": 4,
         "hash": "5ffaba6fff5a6a3e3670800023b98c3283e43a03fa625f6fcf8cf75a9dfb1517"
+    },
+    {
+        "index": 7,
+        "timestamp": "2025-09-17 17:47:46.746262",
+        "data": "Vote Block",
+        "transactions": [
+            {
+                "id": "vote_1_6_5",
+                "sender": "1",
+                "receiver": "6",
+                "amount": 5
+            }
+        ],
+        "proof": 1151,
+        "previous_hash": "5ffaba6fff5a6a3e3670800023b98c3283e43a03fa625f6fcf8cf75a9dfb1517",
+        "difficulty": 3,
+        "hash": "e7288bed6d9ffae0aaf76289f3f786a200378c2c591f14b9822cf026115d356e"
+    },
+    {
+        "index": 8,
+        "timestamp": "2025-09-17 17:48:30.799219",
+        "data": "Vote Block",
+        "transactions": [
+            {
+                "id": "vote_1_9_5",
+                "sender": "1",
+                "receiver": "9",
+                "amount": 5
+            }
+        ],
+        "proof": 1911,
+        "previous_hash": "e7288bed6d9ffae0aaf76289f3f786a200378c2c591f14b9822cf026115d356e",
+        "difficulty": 3,
+        "hash": "a999149722f9247792aa075f5da36b74bead6cb424302ad2446e88f78191cc16"
     }
 ]

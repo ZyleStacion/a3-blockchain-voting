@@ -40,13 +40,11 @@ async def create_vote_transaction(user_id: int, proposal_id: int, tickets: int):
     )
 
     # 4) Insert vote into blockchain pending pool
-    # insert_transaction() rejects duplicates or invalid txs:contentReference[oaicite:1]{index=1}
     valid = blockchain.insert_transaction(vote_tx)
     if not valid:
         return {"success": False, "message": "Failed to insert vote transaction (duplicate or invalid)."}
 
     # 5) Auto-mine a block that includes this vote
-    # auto_mine_block() mines with current pending txs and clears the pool on success:contentReference[oaicite:2]{index=2}
     block = blockchain.auto_mine_block(data="Vote Block")
     if not block:
         # rollback pending tx if mining failed
@@ -61,7 +59,13 @@ async def create_vote_transaction(user_id: int, proposal_id: int, tickets: int):
         {"$inc": {"voting_tickets": -tickets}}
     )
 
-    # (optional) Persist chain so you can see it after restart:contentReference[oaicite:3]{index=3}
+    # 7) Increment YES counter in proposal
+    await proposals_collection.update_one(
+        {"proposal_id": int(proposal_id)},
+        {"$inc": {"yes_counter": tickets}}   # ✅ increment yes votes by number of tickets
+    )
+
+    # (optional) Persist chain so you can see it after restart
     blockchain.save_chain()
 
     return {
@@ -71,6 +75,7 @@ async def create_vote_transaction(user_id: int, proposal_id: int, tickets: int):
         "block_hash": block["hash"],
         "transactions": block["transactions"]
     }
+
 
 
 def record_vote_on_chain(voter_pubkey: str, proposal_id: str, tickets: int) -> dict:

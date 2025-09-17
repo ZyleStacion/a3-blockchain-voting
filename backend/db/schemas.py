@@ -81,18 +81,20 @@ class CreditPurchaseResponse(BaseModel):
 class VoteProposalCreate(BaseModel):    
     title: str
     description: str    
-    options: list[str]  # e.g. ["yes", "no", "abstain"]
+    charity_id: int
 
 class VoteProposalResponse(BaseModel):
     id: int
     title: str
     description: str
-    options: list[str]
-
+    yes_counter: int  
+    
+    
 class VoteSubmit(BaseModel):
     user_id: int
     proposal_id: int
     tickets: int
+    
 
     class Config:
         schema_extra = {
