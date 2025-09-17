@@ -12,7 +12,9 @@ votes_collection = db["votes"]
 transactions_collection = db["transactions"]
 proposals_collection = db["proposals"]
 donation_collection = db["donations"]
+charities_collection = db["charities"]
 counters_collection = db["counters"]
+
 
 
 
@@ -37,6 +39,15 @@ async def get_next_proposal_id():
 async def get_next_donation_id():
     counter = await counters_collection.find_one_and_update(
         {"_id": "donation_id"},
+        {"$inc": {"seq": 1}},
+        upsert=True,
+        return_document=True
+    )
+    return counter["seq"]
+
+async def get_next_charity_id():
+    counter = await counters_collection.find_one_and_update(
+        {"_id": "charity_id"},
         {"$inc": {"seq": 1}},
         upsert=True,
         return_document=True
