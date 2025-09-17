@@ -50,5 +50,73 @@
         "previous_hash": "adb10c7ef90907604a7ad8e1c31ec33a61e4737bccb5b6cf5f169f29a24703a5",
         "difficulty": 3,
         "hash": "6903b77bf296ecf3863ad9199fd4756ad53b6655a9a5c9031af5c26bc2b056f1"
+    },
+    {
+        "index": 3,
+        "timestamp": "2025-09-17 12:35:51.053128",
+        "data": "Vote Block",
+        "transactions": [
+            {
+                "id": "string",
+                "sender": "1",
+                "receiver": "3",
+                "amount": 1.0
+            }
+        ],
+        "proof": 9684,
+        "previous_hash": "6903b77bf296ecf3863ad9199fd4756ad53b6655a9a5c9031af5c26bc2b056f1",
+        "difficulty": 3,
+        "hash": "cce2cf18b41ee9be27da6c89118492dfe750196daf2c059ac5e920e2c3789d67"
+    },
+    {
+        "index": 4,
+        "timestamp": "2025-09-17 12:36:09.915744",
+        "data": "Vote Block",
+        "transactions": [
+            {
+                "id": "1",
+                "sender": "1",
+                "receiver": "1",
+                "amount": 1.0
+            }
+        ],
+        "proof": 1947,
+        "previous_hash": "cce2cf18b41ee9be27da6c89118492dfe750196daf2c059ac5e920e2c3789d67",
+        "difficulty": 3,
+        "hash": "07beea43e5cc7ae3c51364908adcb784ed0ab0ec452e47d76508c9381f12730e"
+    },
+    {
+        "index": 5,
+        "timestamp": "2025-09-17 12:36:27.886691",
+        "data": "Vote Block",
+        "transactions": [
+            {
+                "id": "2",
+                "sender": "1",
+                "receiver": "1",
+                "amount": 1.0
+            }
+        ],
+        "proof": 20800,
+        "previous_hash": "07beea43e5cc7ae3c51364908adcb784ed0ab0ec452e47d76508c9381f12730e",
+        "difficulty": 4,
+        "hash": "69bfdbfee15a636b6316195cb9c045a0cc7105a616a48a6ea3cacde1b64b9980"
+    },
+    {
+        "index": 6,
+        "timestamp": "2025-09-17 12:36:35.180738",
+        "data": "Vote Block",
+        "transactions": [
+            {
+                "id": "3",
+                "sender": "5",
+                "receiver": "5",
+                "amount": 1.0
+            }
+        ],
+        "proof": 309478,
+        "previous_hash": "69bfdbfee15a636b6316195cb9c045a0cc7105a616a48a6ea3cacde1b64b9980",
+        "difficulty": 4,
+        "hash": "5ffaba6fff5a6a3e3670800023b98c3283e43a03fa625f6fcf8cf75a9dfb1517"
     }
 ]

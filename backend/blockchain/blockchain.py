@@ -316,10 +316,6 @@ class Blockchain:
     #Insert Transactions
     def insert_transaction(self, transaction: Transactions) -> bool: 
         """
-        Insert transactions new transactions. 
-        The newly inserted transactions won't be confirmed yet.
-        It will only be confired when someone successfully mined a block.
-        
         Returns:
             _type_: True if insert transactions succesfully, if fail to insert false
         """

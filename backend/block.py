@@ -32,16 +32,16 @@ def get_blockchain_data():
 
 
 # Mine block
-@router.post("/mine_block/")
-def mine_block(data: str = "Vote Block"):
-    if not blockchain.is_chain_valid():
-        raise HTTPException(status_code=400, detail="Invalid Blockchain")
+# @router.post("/mine_block/")
+# def mine_block(data: str = "Vote Block"):
+#     if not blockchain.is_chain_valid():
+#         raise HTTPException(status_code=400, detail="Invalid Blockchain")
 
-    block = blockchain.auto_mine_block(data=data)
-    if not block:
-        raise HTTPException(status_code=400, detail="No pending transactions to mine")
+#     block = blockchain.auto_mine_block(data=data)
+#     if not block:
+#         raise HTTPException(status_code=400, detail="No pending transactions to mine")
 
-    return {"message": "Block auto-mined!", "block": block}
+#     return {"message": "Block auto-mined!", "block": block}
 
 
 # --- Transactions ---
