@@ -59,6 +59,31 @@ function Dashboard() {
     navigate(`/vote/${proposalId}`);
   };
 
+  const handleLogout = async () => {
+    try {
+      // Call backend logout endpoint
+      const token = localStorage.getItem('token');
+      if (token) {
+        await fetch('http://localhost:8000/auth/logout', {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          }
+        });
+      }
+    } catch (error) {
+      console.error('Logout API call failed:', error);
+      // Continue with frontend logout even if API fails
+    } finally {
+      // Clear user data from localStorage
+      localStorage.removeItem('token');
+      localStorage.removeItem('user');
+      // Redirect to home page
+      navigate('/');
+    }
+  };
+
   return (
     <div className="dashboard-container">
       <div className="dashboard-header">
@@ -75,6 +100,9 @@ function Dashboard() {
               <p><strong>User ID:</strong> {userInfo.user_id || userInfo.id}</p>
               <p><strong>Donation Balance:</strong> ${userInfo.donation_balance || 0}</p>
               <p><strong>Voting Tickets:</strong> {userInfo.voting_tickets || 0}</p>
+              <button className="dashboard-button logout-btn" onClick={handleLogout}>
+                Logout
+              </button>
             </div>
           ) : (
             <p>Please login/register to view your account information</p>

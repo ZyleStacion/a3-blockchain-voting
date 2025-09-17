@@ -1,16 +1,47 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './Auth.css';
 
 function BuyTickets() {
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
-    user_id: '',
     amount: 1
   });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
+  const [userInfo, setUserInfo] = useState(null);
+
+  // Fetch user info when component loads
+  useEffect(() => {
+    fetchUserInfo();
+  }, []);
+
+  const fetchUserInfo = async () => {
+    try {
+      const token = localStorage.getItem('token');
+      if (!token) {
+        setError('Please login to buy tickets');
+        return;
+      }
+
+      const response = await fetch('http://localhost:8000/auth/user-info', {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+      
+      if (response.ok) {
+        const user = await response.json();
+        setUserInfo(user);
+      } else {
+        setError('Failed to fetch user information');
+      }
+    } catch (err) {
+      setError('Please login to buy tickets');
+      console.error('Error fetching user info:', err);
+    }
+  };
 
   const handleChange = (e) => {
     setFormData({
@@ -25,15 +56,23 @@ function BuyTickets() {
     setError('');
     setSuccess('');
 
+    if (!userInfo) {
+      setError('User information not available. Please refresh the page.');
+      setLoading(false);
+      return;
+    }
+
     try {
+      const token = localStorage.getItem('token');
       const response = await fetch('http://localhost:8000/vote/buy-tickets', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
         },
         body: JSON.stringify({
-          user_id: formData.user_id,
-          amount: parseInt(formData.amount)
+          user_id: userInfo.user_id,
+          ticket_purchase: parseInt(formData.amount)
         })
       });
 
@@ -62,20 +101,14 @@ function BuyTickets() {
         <h2>Buy Voting Tickets</h2>
         <p>Purchase tickets to participate in community voting</p>
         
-        <form onSubmit={handleSubmit}>
-          <div className="form-group">
-            <label htmlFor="user_id">User ID:</label>
-            <input
-              type="text"
-              id="user_id"
-              name="user_id"
-              placeholder="Enter your user ID"
-              value={formData.user_id}
-              onChange={handleChange}
-              required
-            />
+        {userInfo && (
+          <div className="user-info" style={{ marginBottom: '1rem', padding: '0.5rem', backgroundColor: '#f0f8ff', borderRadius: '5px' }}>
+            <p><strong>Buying tickets for:</strong> {userInfo.username} (ID: {userInfo.user_id})</p>
+            <p><strong>Current tickets:</strong> {userInfo.voting_tickets || 0}</p>
           </div>
-          
+        )}
+        
+        <form onSubmit={handleSubmit}>
           <div className="form-group">
             <label htmlFor="amount">Number of Tickets:</label>
             <input
@@ -97,7 +130,7 @@ function BuyTickets() {
           <button 
             type="submit" 
             className="auth-button"
-            disabled={loading}
+            disabled={loading || !userInfo}
           >
             {loading ? 'Processing...' : `Buy ${formData.amount} Ticket${formData.amount > 1 ? 's' : ''}`}
           </button>
