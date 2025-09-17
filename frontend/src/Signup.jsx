@@ -90,8 +90,34 @@ function Signup() {
       const userData = await response.json();
       console.log('Signup successful:', userData);
 
-      // Store user in localStorage (or context) for dashboard
-      localStorage.setItem('user', JSON.stringify(userData));
+      // After successful signup, automatically log the user in
+      const loginResponse = await fetch('http://localhost:8000/auth/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          username: formData.username,
+          password: formData.password
+        })
+      });
+
+      if (loginResponse.ok) {
+        const loginData = await loginResponse.json();
+        
+        // Store JWT token and user data
+        localStorage.setItem('token', loginData.access_token);
+        localStorage.setItem('user', JSON.stringify(loginData));
+        
+        // Dispatch custom event to notify navbar of auth state change
+        window.dispatchEvent(new Event('authStateChanged'));
+        
+        console.log('Auto-login successful after signup');
+      } else {
+        // If auto-login fails, just store user data without token
+        localStorage.setItem('user', JSON.stringify(userData));
+        console.log('Signup successful but auto-login failed');
+      }
 
       // Redirect to dashboard
       navigate('/dashboard');
