@@ -21,7 +21,7 @@ function Dashboard() {
   const fetchActiveProposals = async () => {
     try {
       setLoading(true);
-      const response = await fetch('http://localhost:8000/charities/get_all');
+      const response = await fetch('http://localhost:8000/charities/get-all');
       if (response.ok) {
         const data = await response.json();
         // Map charity data to proposals format for compatibility
