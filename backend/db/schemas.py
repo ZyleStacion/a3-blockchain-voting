@@ -132,7 +132,7 @@ class CharityCreate(BaseModel):
     contact_email: Optional[str] = None
     
 class CharityResponseModel(BaseModel):
-    id: str
+    id: int
     name: str
     description: Optional[str] = None
     contact_email: Optional[str] = None
