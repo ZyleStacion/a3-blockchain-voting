@@ -123,3 +123,19 @@ class DonationResponse(BaseModel):
                 "message": "Donation for a good cause"
             }
         }
+         
+
+# Charity schema
+class CharityCreate(BaseModel):
+    name: str
+    description: Optional[str] = None
+    contact_email: Optional[str] = None
+    
+class CharityResponseModel(BaseModel):
+    id: str
+    name: str
+    description: Optional[str] = None
+    contact_email: Optional[str] = None
+
+    class Config:
+        orm_mode = True
