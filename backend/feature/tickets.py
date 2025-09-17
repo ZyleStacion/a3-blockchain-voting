@@ -2,7 +2,6 @@ import datetime
 import uuid
 from db.schemas import TicketPurchase, TicketResponse
 from db.database import users_collection
-from db.save import load_data, save_data
 from feature.voting import start_new_voting_period, THRESHOLD_AMOUNT
 
 def calculate_qv_cost(tickets: int) -> int:
@@ -48,3 +47,4 @@ async def buy_tickets(purchase: TicketPurchase) -> dict:
         "remaining_balance": donation_balance - cost,  # Include updated balance in response
         "total_tickets": user.get("voting_tickets", 0) + ticket_purchase
     }
+

@@ -186,5 +186,39 @@
         "previous_hash": "f5631888e8affacd62d0994852756c3404bb3d0ce55d0641023e487c0d38f254",
         "difficulty": 4,
         "hash": "8fbaebfc4e81260927815d10be0b4c09f0f5743c2f066469b803881939a0b9ab"
+    },
+    {
+        "index": 11,
+        "timestamp": "2025-09-17 18:53:46.024072",
+        "data": "Vote Block",
+        "transactions": [
+            {
+                "id": "vote_1_12_5",
+                "sender": "1",
+                "receiver": "12",
+                "amount": 5
+            }
+        ],
+        "proof": 12798,
+        "previous_hash": "8fbaebfc4e81260927815d10be0b4c09f0f5743c2f066469b803881939a0b9ab",
+        "difficulty": 3,
+        "hash": "3c73ceb312bb17fb62b378ba1ff70449332c9190b1bd3776d7ff8584713a9c08"
+    },
+    {
+        "index": 12,
+        "timestamp": "2025-09-17 18:53:59.421746",
+        "data": "Vote Block",
+        "transactions": [
+            {
+                "id": "vote_2_12_5",
+                "sender": "2",
+                "receiver": "12",
+                "amount": 5
+            }
+        ],
+        "proof": 9348,
+        "previous_hash": "3c73ceb312bb17fb62b378ba1ff70449332c9190b1bd3776d7ff8584713a9c08",
+        "difficulty": 3,
+        "hash": "4e6dab4a61df95835598326c9a9c1481d3362f150ee3fb48a540d4c790943a51"
     }
 ]

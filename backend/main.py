@@ -48,11 +48,5 @@ app.include_router(donation_router)
 app.include_router(block_router)
 app.include_router(charity_router)
 
-# Status endpoint
-@app.get("/api/status")
-async def get_status():
-    data = load_data()
-    return data
-
 if __name__ == "__main__": # Alow to be access from anywhere
     uvicorn.run(app, host="0.0.0.0", port=8000)
