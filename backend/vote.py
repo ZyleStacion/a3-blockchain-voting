@@ -62,6 +62,15 @@ async def get_active_proposals():
     except Exception as e:
         raise HTTPException(status_code=500, detail="Failed to fetch proposals")
 
+@vote_router.get("/get_active_proposals")
+async def get_active_proposals_alt():
+    """Alternative endpoint: Get all active voting proposals"""
+    try:
+        proposals = await proposals_collection.find({}).to_list(100)
+        return proposals
+    except Exception as e:
+        raise HTTPException(status_code=500, detail="Failed to fetch proposals")
+
 @vote_router.get("/proposal/{proposal_id}")
 async def get_proposal(proposal_id: int):
     """Get a specific proposal by ID"""
