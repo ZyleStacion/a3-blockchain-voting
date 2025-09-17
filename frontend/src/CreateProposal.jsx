@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './Auth.css';
 
@@ -6,10 +6,36 @@ function CreateProposal() {
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
     title: '',
-    description: ''
+    description: '',
+    charity_id: ''
   });
+  const [charities, setCharities] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [loadingCharities, setLoadingCharities] = useState(true);
   const [error, setError] = useState('');
+
+  // Fetch available charities on component mount
+  useEffect(() => {
+    fetchCharities();
+  }, []);
+
+  const fetchCharities = async () => {
+    try {
+      setLoadingCharities(true);
+      const response = await fetch('http://localhost:8000/charities/get-all');
+      
+      if (!response.ok) {
+        throw new Error('Failed to fetch charities');
+      }
+      
+      const data = await response.json();
+      setCharities(data.charities || []);
+    } catch (err) {
+      setError('Failed to load charities: ' + err.message);
+    } finally {
+      setLoadingCharities(false);
+    }
+  };
 
   const handleChange = (e) => {
     setFormData({
@@ -32,7 +58,7 @@ function CreateProposal() {
         body: JSON.stringify({
           title: formData.title,
           description: formData.description,
-          options: ['Yes', 'No']
+          charity_id: parseInt(formData.charity_id)
         })
       });
 
@@ -95,6 +121,81 @@ function CreateProposal() {
           </div>
           
           <div className="form-group">
+            <label htmlFor="charity">Select Charity:</label>
+            {loadingCharities ? (
+              <div style={{ 
+                padding: '12px 15px',
+                border: '2px solid #e1e5e9',
+                borderRadius: '8px',
+                background: '#f8f9fa',
+                textAlign: 'center'
+              }}>
+                Loading charities...
+              </div>
+            ) : (
+              <select
+                id="charity"
+                name="charity_id"
+                value={formData.charity_id}
+                onChange={handleChange}
+                required
+                style={{
+                  width: '100%',
+                  padding: '12px 15px',
+                  border: '2px solid #e1e5e9',
+                  borderRadius: '8px',
+                  fontSize: '1rem',
+                  background: 'white',
+                  boxSizing: 'border-box',
+                  appearance: 'none',
+                  backgroundImage: 'url("data:image/svg+xml;charset=UTF-8,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 24 24\' fill=\'none\' stroke=\'currentColor\' stroke-width=\'2\' stroke-linecap=\'round\' stroke-linejoin=\'round\'%3E%3Cpolyline points=\'6,9 12,15 18,9\'%3E%3C/polyline%3E%3C/svg%3E")',
+                  backgroundRepeat: 'no-repeat',
+                  backgroundPosition: 'right 12px center',
+                  backgroundSize: '20px',
+                  paddingRight: '45px'
+                }}
+              >
+                <option value="">Choose a charity...</option>
+                {charities.map((charity) => (
+                  <option key={charity.charity_id} value={charity.charity_id}>
+                    {charity.name} - {charity.contact_email}
+                  </option>
+                ))}
+              </select>
+            )}
+            {charities.length === 0 && !loadingCharities && (
+              <p style={{ 
+                color: '#dc3545', 
+                fontSize: '0.9rem', 
+                marginTop: '5px' 
+              }}>
+                No charities available. Please contact an administrator.
+              </p>
+            )}
+          </div>
+          
+          <div className="form-group">
+            <label>Voting Information:</label>
+            <div style={{ 
+              background: '#f8f9fa',
+              padding: '15px',
+              borderRadius: '8px',
+              border: '2px solid #e1e5e9',
+              fontSize: '0.95rem',
+              margin: '10px 0'
+            }}>
+              <p style={{ margin: '0 0 10px 0' }}>
+                <strong>How it works:</strong>
+              </p>
+              <ul style={{ margin: '0', paddingLeft: '20px' }}>
+                <li>Users will vote by allocating their tickets to support this proposal</li>
+                <li>More tickets = stronger support for the selected charity</li>
+                <li>Each user can cast up to 15 votes total across all proposals</li>
+              </ul>
+            </div>
+          </div>
+          
+          <div className="form-group">
             <label>Voting Type:</label>
             <p style={{ 
               background: '#f8f9fa',
@@ -105,7 +206,7 @@ function CreateProposal() {
               margin: '10px 0',
               textAlign: 'center'
             }}>
-              This proposal will have <strong>Yes/No</strong> voting options
+              This proposal will receive <strong>ticket-based votes</strong> supporting the selected charity
             </p>
           </div>
           
@@ -114,7 +215,7 @@ function CreateProposal() {
           <button 
             type="submit" 
             className="auth-button"
-            disabled={loading}
+            disabled={loading || loadingCharities || !formData.charity_id}
           >
             {loading ? 'Creating...' : 'Create Proposal'}
           </button>
