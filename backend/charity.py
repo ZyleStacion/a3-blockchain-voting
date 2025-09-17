@@ -3,23 +3,45 @@ from datetime import datetime
 from fastapi import APIRouter, HTTPException, Body
 from db.database import charities_collection, get_next_charity_id
 from db.schemas import CharityCreate, CharityResponseModel, CharityUpdate
+from datetime import datetime
+import pytz
+
+LOCAL_TZ = pytz.timezone("Asia/Ho_Chi_Minh")
 
 charity_router = APIRouter(prefix="/charities", tags=["Charities"])
 
 # --- Create a new charity ---
+# --- Create a new charity ---
 @charity_router.post("/add-charity")
 async def add_charity(request: CharityCreate):
     charity_id = await get_next_charity_id()
+    now = datetime.now(LOCAL_TZ).replace(tzinfo=None)  # local time without tzinfo
+
+    try:
+        open_time = datetime.fromisoformat(request.open_time)
+        close_time = datetime.fromisoformat(request.close_time)
+    except Exception:
+        raise HTTPException(status_code=400, detail="Invalid open_time/close_time format. Use ISO 8601.")
+
+    # Decide initial status
+    status = "Closed"
+    session_consumed = False
+
+    if open_time <= now <= close_time:
+        status = "Open"
+    elif now > close_time:
+        status = "Closed"
+        session_consumed = True
 
     charity_data = {
         "charity_id": charity_id,
         "name": request.name,
         "description": request.description,
         "contact_email": request.contact_email,
-        "status": "Closed",                 # Default closed until open_time
-        "open_time": request.open_time,     # ISO string
-        "close_time": request.close_time,   # ISO string
-        "session_consumed": False
+        "status": status,
+        "open_time": request.open_time,
+        "close_time": request.close_time,
+        "session_consumed": session_consumed
     }
 
     result = await charities_collection.insert_one(charity_data)
@@ -31,7 +53,6 @@ async def add_charity(request: CharityCreate):
         "id": charity_id,
         "message": f"Charity '{request.name}' created successfully."
     }
-
 
 @charity_router.get("/get-all")
 async def get_all_charities():
@@ -48,14 +69,15 @@ async def get_all_charities():
         ))
     return {"charities": charities}
 
-# --- Utility: update status based on current time ---
+# --- Utility: update status based on Vietnam time ---
 async def update_charity_status(charity: dict):
-    now = datetime.utcnow()
+    now = datetime.now(LOCAL_TZ).replace(tzinfo=None)
+
     try:
         open_time = datetime.fromisoformat(charity["open_time"])
         close_time = datetime.fromisoformat(charity["close_time"])
     except Exception:
-        return charity  # skip if invalid or missing times
+        return charity
 
     if not charity.get("session_consumed", False):
         if open_time <= now <= close_time:
@@ -69,7 +91,6 @@ async def update_charity_status(charity: dict):
                 {"$set": {"status": "Closed", "session_consumed": True}}
             )
     return charity
-
 
 # --- Get only active (open) charities ---
 @charity_router.get("/get-active")

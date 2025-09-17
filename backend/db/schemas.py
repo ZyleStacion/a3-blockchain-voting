@@ -1,5 +1,5 @@
 from pydantic import BaseModel, Field
-from typing import Dict, Optional
+from typing import Dict, List, Optional
 
 # User schemas 
 class UserCreate(BaseModel):
@@ -72,7 +72,7 @@ class CreditPurchaseResponse(BaseModel):
     user_id: str
     credits_purchased: int
 
-    
+
     class Config:
         form_mode = True
         
@@ -104,28 +104,7 @@ class VoteSubmit(BaseModel):
                 "tickets": 5
             }
         }
-#Donation schema
-class DonationCreate(BaseModel):
-    user_id: int
-    amount: float
-    message: str
-    
-        
-class DonationResponse(BaseModel):
-    donation_id: int
-    user_id: int
-    amount: float
-    message: str = "Donation successful"
 
-    class Config:
-         schema_extra = {
-            "example": {
-                "user_id": 1,
-                "amount": 1,
-                "message": "Donation for a good cause"
-            }
-        }
-         
 
 # Charity schema
 class CharityCreate(BaseModel):
