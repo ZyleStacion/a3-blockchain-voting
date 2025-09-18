@@ -42,8 +42,16 @@ function Vote() {
       return;
     }
 
-    if (!selectedOption) {
-      setError('Please select an option');
+    // Validate ticket amount
+    const ticketAmount = parseInt(tickets);
+    if (ticketAmount < 1) {
+      setError('Please enter at least 1 ticket');
+      setLoading(false);
+      return;
+    }
+    
+    if (ticketAmount > 15) {
+      setError('Maximum 15 tickets per vote allowed');
       setLoading(false);
       return;
     }
@@ -55,10 +63,9 @@ function Vote() {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          user_id: userId,
+          user_id: parseInt(userId),
           proposal_id: parseInt(proposalId),
-          selected_option: selectedOption,
-          tickets: parseInt(tickets)
+          tickets: ticketAmount
         })
       });
 
@@ -149,11 +156,22 @@ function Vote() {
               id="tickets"
               placeholder="1"
               min="1"
-              max="10"
+              max="15"
               value={tickets}
-              onChange={(e) => setTickets(e.target.value)}
+              onChange={(e) => {
+                const value = parseInt(e.target.value);
+                // Validate ticket input - max 15, min 1
+                if (value >= 1 && value <= 15) {
+                  setTickets(e.target.value);
+                } else if (e.target.value === '') {
+                  setTickets('');
+                }
+              }}
               required
             />
+            <small style={{ color: '#666', fontSize: '0.9rem' }}>
+              Maximum 15 tickets per vote
+            </small>
           </div>
           
           {error && <div className="error-message">{error}</div>}

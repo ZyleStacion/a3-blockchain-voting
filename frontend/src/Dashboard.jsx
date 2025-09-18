@@ -83,15 +83,51 @@ const fetchActiveProposals = async () => {
   };
 
   const handleVoteChange = (e) => {
+    const { name, value } = e.target;
+    
+    // Add validation for tickets input
+    if (name === 'tickets') {
+      const ticketValue = parseInt(value);
+      const maxAllowed = Math.min(userInfo?.voting_tickets || 1, 15);
+      
+      // Ensure tickets don't exceed the maximum allowed
+      if (ticketValue > maxAllowed) {
+        return; // Don't update if exceeds limit
+      }
+      
+      if (ticketValue < 1) {
+        return; // Don't allow less than 1
+      }
+    }
+    
     setVoteData({
       ...voteData,
-      [e.target.name]: e.target.value
+      [name]: value
     });
   };
 
   const handleSubmitVote = async (e) => {
     e.preventDefault();
     if (!userInfo || !selectedProposal) return;
+
+    // Additional validation for ticket amount
+    const ticketAmount = parseInt(voteData.tickets);
+    const maxAllowed = Math.min(userInfo.voting_tickets || 0, 15);
+    
+    if (ticketAmount < 1) {
+      alert('Please enter at least 1 ticket');
+      return;
+    }
+    
+    if (ticketAmount > maxAllowed) {
+      alert(`You can only use up to ${maxAllowed} tickets`);
+      return;
+    }
+    
+    if (ticketAmount > userInfo.voting_tickets) {
+      alert('You do not have enough voting tickets');
+      return;
+    }
 
     setSubmitting(true);
     try {
@@ -104,8 +140,7 @@ const fetchActiveProposals = async () => {
         body: JSON.stringify({
           user_id: userInfo.user_id,
           proposal_id: selectedProposal.proposal_id || selectedProposal._id,
-          tickets: parseInt(voteData.tickets),
-          option: voteData.option
+          tickets: ticketAmount
         })
       });
 
@@ -214,13 +249,15 @@ const fetchActiveProposals = async () => {
                     id="tickets"
                     name="tickets"
                     min="1"
-                    max={userInfo?.voting_tickets || 1}
+                    max={Math.min(userInfo?.voting_tickets || 1, 15)}
                     value={voteData.tickets}
                     onChange={handleVoteChange}
                     required
                     style={{ width: '100%', padding: '0.5rem', borderRadius: '4px', border: '1px solid #ccc' }}
                   />
-                  <small style={{ color: '#666', fontSize: '0.9rem' }}>Available tickets: {userInfo?.voting_tickets || 0}</small>
+                  <small style={{ color: '#666', fontSize: '0.9rem' }}>
+                    Available tickets: {userInfo?.voting_tickets || 0} | Max per vote: 15
+                  </small>
                 </div>
                 
                 <div className="form-buttons" style={{ display: 'flex', gap: '0.5rem', justifyContent: 'space-between' }}>

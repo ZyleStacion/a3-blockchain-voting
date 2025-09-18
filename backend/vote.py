@@ -90,18 +90,38 @@ async def update_charity_status(charity: dict):
 async def get_active_proposals():
     """Get proposals linked to currently open charities"""
     try:
-        proposals = []
-        async for proposal in proposals_collection.find({}, {"_id": 0}):
-            charity = await charities_collection.find_one({"charity_id": proposal["charity"]["charity_id"]})
-            if charity:
-                charity = await update_charity_status(charity)
-                if charity["status"] == "Open":
-                    proposals.append(proposal)
-
+        print("🔍 Fetching active proposals...")
+        
+        # Get all proposals first
+        proposals_cursor = proposals_collection.find({}, {"_id": 0})
+        all_proposals = await proposals_cursor.to_list(length=None)
+        
+        print(f"📄 Found {len(all_proposals)} total proposals")
+        
+        active_proposals = []
+        
+        for proposal in all_proposals:
+            try:
+                charity_id = proposal.get("charity", {}).get("charity_id")
+                if charity_id:
+                    charity = await charities_collection.find_one({"charity_id": charity_id})
+                    if charity:
+                        charity = await update_charity_status(charity)
+                        if charity.get("status") == "Open":
+                            active_proposals.append(proposal)
+                            print(f"✅ Added active proposal: {proposal.get('title', 'N/A')}")
+            except Exception as e:
+                print(f"❌ Error processing proposal {proposal.get('proposal_id', 'N/A')}: {e}")
+                continue
+        
+        print(f"🎯 Returning {len(active_proposals)} active proposals")
+        
         return {
             "success": True,
-            "count": len(proposals),
-            "proposals": proposals
+            "count": len(active_proposals),
+            "proposals": active_proposals
         }
+        
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Failed to fetch proposals: {e}")
+        print(f"❌ Error in get_active_proposals: {e}")
+        raise HTTPException(status_code=500, detail=f"Failed to fetch proposals: {str(e)}")

@@ -13,7 +13,6 @@ from charity import charity_router as charity_router
 # Set up
 app = FastAPI()
 router = APIRouter()
-app.include_router(router)
 
 # Add CORS middleware - allows web browser to accept requests from different origins
 # Allow frontend (Vite) + any others you need
@@ -48,3 +47,5 @@ app.include_router(charity_router)
 
 if __name__ == "__main__": # Alow to be access from anywhere
     uvicorn.run(app, host="0.0.0.0", port=8000)
+
+app.include_router(router)

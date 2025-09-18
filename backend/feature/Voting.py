@@ -17,20 +17,30 @@ def calculate_hash(data_dict: Dict[str, Any]) -> str:
 
 
 async def create_vote_transaction(user_id: int, proposal_id: int, tickets: int):
+    print(f"🗳️  START: create_vote_transaction(user_id={user_id}, proposal_id={proposal_id}, tickets={tickets})")
+    
     # 1) Verify user & tickets
+    print(f"🔍 Step 1: Looking up user {user_id}...")
     user = await users_collection.find_one({"user_id": int(user_id)})
     if not user:
+        print(f"❌ User {user_id} not found in database")
         return {"success": False, "message": f"User ID {user_id} not found."}
+    print(f"✅ User found: {user.get('email', 'N/A')}, voting_tickets={user.get('voting_tickets', 0)}")
 
     if user.get("voting_tickets", 0) < tickets:
+        print(f"❌ Not enough tickets: user has {user.get('voting_tickets', 0)}, needs {tickets}")
         return {"success": False, "message": "Not enough voting tickets."}
 
     # 2) Verify proposal
+    print(f"🔍 Step 2: Looking up proposal {proposal_id}...")
     proposal = await proposals_collection.find_one({"proposal_id": int(proposal_id)})
     if not proposal:
+        print(f"❌ Proposal {proposal_id} not found in database")
         return {"success": False, "message": f"Proposal ID {proposal_id} not found."}
+    print(f"✅ Proposal found: {proposal.get('title', 'N/A')}")
 
     tx_id = f"vote_{user_id}_{proposal_id}_{tickets}"
+    print(f"🏷️  Step 3: Created transaction ID: {tx_id}")
 
     vote_tx = Transactions(
         transaction_id=tx_id,
@@ -38,35 +48,58 @@ async def create_vote_transaction(user_id: int, proposal_id: int, tickets: int):
         charity_receive=int(proposal_id),
         ticket_sent=tickets
     )
+    print(f"📝 Step 4: Created transaction object: sender={vote_tx.sender}, receiver={vote_tx.receiver}, amount={vote_tx.amount}")
 
     # 4) Insert vote into blockchain pending pool
+    print(f"🔗 Step 5: Inserting transaction into blockchain pending pool...")
+    print(f"   Current pending transactions: {len(blockchain.pending_transactions)}")
     valid = blockchain.insert_transaction(vote_tx)
     if not valid:
+        print(f"❌ Failed to insert transaction - duplicate or invalid")
         return {"success": False, "message": "Failed to insert vote transaction (duplicate or invalid)."}
+    print(f"✅ Transaction inserted successfully. New pending count: {len(blockchain.pending_transactions)}")
 
     # 5) Auto-mine a block that includes this vote
+    print(f"⛏️  Step 6: Mining block with pending transactions...")
+    print(f"   Current chain length: {len(blockchain.chain)}")
     block = blockchain.auto_mine_block(data="Vote Block")
     if not block:
+        print(f"❌ Block mining failed - rolling back transaction")
         # rollback pending tx if mining failed
         blockchain.pending_transactions = [
             tx for tx in blockchain.pending_transactions if tx.get("id") != tx_id
         ]
         return {"success": False, "message": "Failed to mine vote block."}
+    print(f"✅ Block mined successfully!")
+    print(f"   Block index: {block.get('index', 'N/A')}")
+    print(f"   Block hash: {block.get('hash', 'N/A')[:20]}...")
+    print(f"   New chain length: {len(blockchain.chain)}")
 
     # 6) Deduct tickets ONLY AFTER block is successfully mined
+    print(f"💳 Step 7: Updating user tickets in database...")
     await users_collection.update_one(
         {"user_id": int(user_id)},
         {"$inc": {"voting_tickets": -tickets}}
     )
+    print(f"✅ User tickets updated: deducted {tickets} tickets")
 
     # 7) Increment YES counter in proposal
+    print(f"📊 Step 8: Updating proposal vote counter...")
     await proposals_collection.update_one(
         {"proposal_id": int(proposal_id)},
         {"$inc": {"yes_counter": tickets}}   # ✅ increment yes votes by number of tickets
     )
+    print(f"✅ Proposal counter updated: added {tickets} votes")
 
     # (optional) Persist chain so you can see it after restart
-    blockchain.save_chain()
+    print(f"💾 Step 9: Saving blockchain to file...")
+    try:
+        blockchain.save_chain()
+        print(f"✅ Blockchain saved successfully!")
+    except Exception as e:
+        print(f"❌ Failed to save blockchain: {str(e)}")
+
+    print(f"🎉 SUCCESS: Vote transaction completed successfully!")
 
     return {
         "success": True,
