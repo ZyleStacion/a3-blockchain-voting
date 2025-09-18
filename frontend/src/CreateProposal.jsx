@@ -22,25 +22,41 @@ function CreateProposal() {
   const fetchCharities = async () => {
     try {
       setLoadingCharities(true);
+      console.log('Fetching charities from:', 'http://localhost:8000/charities/get-all');
+      
       const response = await fetch('http://localhost:8000/charities/get-all');
       
+      console.log('Charities response status:', response.status, response.statusText);
+      
       if (!response.ok) {
-        throw new Error('Failed to fetch charities');
+        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
       }
       
       const data = await response.json();
+      console.log('Charities data received:', data);
+      console.log('Individual charities:', data.charities?.map(c => ({ 
+        id: c.id, 
+        name: c.name, 
+        idType: typeof c.id 
+      })));
+      
       setCharities(data.charities || []);
     } catch (err) {
-      setError('Failed to load charities: ' + err.message);
+      console.error('Error fetching charities:', err);
+      const errorMessage = err instanceof Error ? err.message : 'Failed to load charities';
+      setError('Failed to load charities: ' + errorMessage);
     } finally {
       setLoadingCharities(false);
     }
   };
 
   const handleChange = (e) => {
+    const { name, value } = e.target;
+    console.log(`Form field changed: ${name} = ${value} (type: ${typeof value})`);
+    
     setFormData({
       ...formData,
-      [e.target.name]: e.target.value
+      [name]: value
     });
   };
 
@@ -49,30 +65,70 @@ function CreateProposal() {
     setLoading(true);
     setError('');
 
+    // Validate charity selection
+    if (!formData.charity_id || formData.charity_id === '') {
+      setError('Please select a charity for your proposal.');
+      setLoading(false);
+      return;
+    }
+
+    const charityId = parseInt(formData.charity_id);
+    if (isNaN(charityId)) {
+      setError('Invalid charity selection. Please select a valid charity.');
+      setLoading(false);
+      return;
+    }
+
+    const requestData = {
+      title: formData.title,
+      description: formData.description,
+      charity_id: charityId
+    };
+
+    console.log('Sending proposal request:', requestData);
+    console.log('Original charity_id value:', formData.charity_id, 'Type:', typeof formData.charity_id);
+
     try {
       const response = await fetch('http://localhost:8000/vote/create-proposal', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({
-          title: formData.title,
-          description: formData.description,
-          charity_id: parseInt(formData.charity_id)
-        })
+        body: JSON.stringify(requestData)
       });
 
+      console.log('Response status:', response.status, response.statusText);
+
       if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.detail || 'Failed to create proposal');
+        const errorData = await response.json().catch(() => ({ detail: 'Unknown error occurred' }));
+        throw new Error(errorData.detail || errorData.message || `HTTP ${response.status}: ${response.statusText}`);
       }
 
       const result = await response.json();
-      alert('Proposal created successfully!');
-      navigate('/dashboard');
+      console.log('Proposal creation result:', result);
+      
+      if (result.success) {
+        alert(`Proposal created successfully! ID: ${result.id}`);
+        navigate('/dashboard');
+      } else {
+        throw new Error(result.message || 'Failed to create proposal');
+      }
 
     } catch (err) {
-      setError(err.message);
+      console.error('Proposal creation error:', err);
+      
+      // Handle different error types properly
+      let errorMessage = 'An unknown error occurred';
+      
+      if (typeof err === 'string') {
+        errorMessage = err;
+      } else if (err instanceof Error) {
+        errorMessage = err.message;
+      } else if (err && typeof err === 'object') {
+        errorMessage = err.detail || err.message || JSON.stringify(err);
+      }
+      
+      setError(errorMessage);
     } finally {
       setLoading(false);
     }
@@ -157,7 +213,7 @@ function CreateProposal() {
               >
                 <option value="">Choose a charity...</option>
                 {charities.map((charity) => (
-                  <option key={charity.charity_id} value={charity.charity_id}>
+                  <option key={charity.id} value={String(charity.id)}>
                     {charity.name} - {charity.contact_email}
                   </option>
                 ))}
