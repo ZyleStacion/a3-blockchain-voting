@@ -322,5 +322,73 @@
         "previous_hash": "82ea3c9807ee72f847ff8c984a8559b41fc4de94643ff3995c4ea537faf99801",
         "difficulty": 2,
         "hash": "347c5a5067b9fb50c33e5b7adf12e77862648cd8c76feb3c33885f86850a6720"
+    },
+    {
+        "index": 19,
+        "timestamp": "2025-09-18 11:37:36.141821",
+        "data": "Vote Block",
+        "transactions": [
+            {
+                "id": "vote_1_3_1_1758170256",
+                "sender": 1,
+                "charity_receive": 3,
+                "ticket_sent": 1
+            }
+        ],
+        "proof": 1178,
+        "previous_hash": "347c5a5067b9fb50c33e5b7adf12e77862648cd8c76feb3c33885f86850a6720",
+        "difficulty": 3,
+        "hash": "443c243dd0e8bd01c0c764291b4eb98e4481ef0a9f7375d3530e32f460d30eb6"
+    },
+    {
+        "index": 20,
+        "timestamp": "2025-09-18 11:37:43.109100",
+        "data": "Vote Block",
+        "transactions": [
+            {
+                "id": "vote_1_1_1_1758170262",
+                "sender": 1,
+                "charity_receive": 1,
+                "ticket_sent": 1
+            }
+        ],
+        "proof": 53931,
+        "previous_hash": "443c243dd0e8bd01c0c764291b4eb98e4481ef0a9f7375d3530e32f460d30eb6",
+        "difficulty": 4,
+        "hash": "f0dbdb5c2a7c526dbf86b013aaa4969ae6b425b646c48dca6b035340df961bd2"
+    },
+    {
+        "index": 21,
+        "timestamp": "2025-09-18 11:43:32.656642",
+        "data": "Vote Block",
+        "transactions": [
+            {
+                "id": "vote_2_1_9_1758170612",
+                "sender": 2,
+                "charity_receive": 1,
+                "ticket_sent": 9
+            }
+        ],
+        "proof": 46528,
+        "previous_hash": "f0dbdb5c2a7c526dbf86b013aaa4969ae6b425b646c48dca6b035340df961bd2",
+        "difficulty": 4,
+        "hash": "7d388216206c678bb6bfb0cc51469b486d7d7e773b57dcb03dd39f2ab02834cd"
+    },
+    {
+        "index": 22,
+        "timestamp": "2025-09-18 11:47:26.531405",
+        "data": "Vote Block",
+        "transactions": [
+            {
+                "id": "vote_2_4_1_1758170846",
+                "sender": 2,
+                "charity_receive": 4,
+                "ticket_sent": 1
+            }
+        ],
+        "proof": 61863,
+        "previous_hash": "7d388216206c678bb6bfb0cc51469b486d7d7e773b57dcb03dd39f2ab02834cd",
+        "difficulty": 4,
+        "hash": "b346eb355912f376344dcfdf9a0815baa73cae124c03b67d881783c9d247589b"
     }
-]
+]   
