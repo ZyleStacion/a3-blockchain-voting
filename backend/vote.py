@@ -22,8 +22,13 @@ async def buy_tickets_endpoint(request: TicketPurchase):
 async def create_proposal_endpoint(request: VoteProposalCreate):
     proposal_id = await get_next_proposal_id()
 
-    # 1) Normalize charity_id (allow int or str in DB)
-    charity = await charities_collection.find_one({"charity_id": request.charity_id})
+    # 1) Check if charity exists - handle both id formats
+    charity = await charities_collection.find_one({
+        "$or": [
+            {"charity_id": request.charity_id},
+            {"id": request.charity_id}
+        ]
+    })
     if not charity:
         charity = await charities_collection.find_one({"charity_id": str(request.charity_id)})
 
@@ -33,14 +38,15 @@ async def create_proposal_endpoint(request: VoteProposalCreate):
             detail=f"Charity ID {request.charity_id} not found"
         )
 
-    # 2) Build the proposal document (always embed charity)
+    # 2) Build the proposal document
+    charity_id = charity.get("charity_id") or charity.get("id")
     proposal_data = {
         "proposal_id": int(proposal_id),
         "title": request.title,
         "description": request.description,
         "yes_counter": 0,
-        "charity": {
-            "charity_id": charity["charity_id"],
+        "charity": {   # ✅ embed charity reference
+            "charity_id": charity_id,
             "name": charity["name"],
             "contact_email": charity.get("contact_email", None),
         },

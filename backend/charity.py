@@ -58,8 +58,11 @@ async def add_charity(request: CharityCreate):
 async def get_all_charities():
     charities = []
     async for charity in charities_collection.find():
+        # Handle both old format (charity_id) and new format (id)
+        charity_id = charity.get("charity_id") or charity.get("id")
+        
         charities.append(CharityResponseModel(
-            id=charity.get("charity_id"),
+            id=charity_id,
             name=charity.get("name"),
             description=charity.get("description"),
             contact_email=charity.get("contact_email"),
