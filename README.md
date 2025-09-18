@@ -40,16 +40,11 @@ Please install the following dependencies:
 
 ### Backend:
 ```bash
+# TODO: Install dependencies
 cd backend
 uvicorn main
 127.0.01:8080
-TODO
 ```
-- fastapi==0.111.0
-- uvicorn==0.30.1
-- pydantic==2.8.2
-- motor==3.4.0
-- pymongo==4.6.1
 
 ### Frontend:
 ```bash
