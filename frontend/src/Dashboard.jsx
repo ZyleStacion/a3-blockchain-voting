@@ -108,26 +108,55 @@ const fetchActiveProposals = async () => {
 
   const handleSubmitVote = async (e) => {
     e.preventDefault();
-    if (!userInfo || !selectedProposal) return;
+    
+    console.log('🗳️ VOTE SUBMISSION STARTED');
+    console.log('📋 User Info:', userInfo);
+    console.log('📝 Selected Proposal:', selectedProposal);
+    console.log('🎫 Vote Data:', voteData);
+    
+    if (!userInfo || !selectedProposal) {
+      console.log('❌ Missing user info or selected proposal');
+      return;
+    }
 
     // Additional validation for ticket amount
     const ticketAmount = parseInt(voteData.tickets);
     const maxAllowed = Math.min(userInfo.voting_tickets || 0, 15);
     
+    console.log('🔢 Ticket Validation:');
+    console.log('   - Raw tickets input:', voteData.tickets);
+    console.log('   - Parsed tickets:', ticketAmount);
+    console.log('   - User available tickets:', userInfo.voting_tickets);
+    console.log('   - Max allowed:', maxAllowed);
+    
     if (ticketAmount < 1) {
+      console.log('❌ Validation failed: tickets < 1');
       alert('Please enter at least 1 ticket');
       return;
     }
     
     if (ticketAmount > maxAllowed) {
+      console.log('❌ Validation failed: tickets > maxAllowed');
       alert(`You can only use up to ${maxAllowed} tickets`);
       return;
     }
     
     if (ticketAmount > userInfo.voting_tickets) {
+      console.log('❌ Validation failed: insufficient tickets');
       alert('You do not have enough voting tickets');
       return;
     }
+
+    const requestPayload = {
+      user_id: userInfo.user_id,
+      proposal_id: selectedProposal.proposal_id || selectedProposal._id,
+      tickets: ticketAmount
+    };
+    
+    console.log('📤 Sending vote request:');
+    console.log('   - URL: http://localhost:8000/vote/submit-vote');
+    console.log('   - Payload:', requestPayload);
+    console.log('   - Headers: Content-Type: application/json, Authorization: Bearer [token]');
 
     setSubmitting(true);
     try {
@@ -137,26 +166,35 @@ const fetchActiveProposals = async () => {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${localStorage.getItem('token')}`
         },
-        body: JSON.stringify({
-          user_id: userInfo.user_id,
-          proposal_id: selectedProposal.proposal_id || selectedProposal._id,
-          tickets: ticketAmount
-        })
+        body: JSON.stringify(requestPayload)
       });
 
+      console.log('📥 Response received:');
+      console.log('   - Status:', response.status, response.statusText);
+      console.log('   - OK:', response.ok);
+
       if (response.ok) {
+        const responseData = await response.json();
+        console.log('✅ Vote submission successful!');
+        console.log('   - Response data:', responseData);
         alert('Vote submitted successfully!');
         handleCloseVoting();
         // Refresh user info to update ticket count
         await fetchUserInfo();
       } else {
-        const errorData = await response.json();
+        const errorData = await response.json().catch(() => ({ detail: 'Unknown error' }));
+        console.log('❌ Vote submission failed!');
+        console.log('   - Error data:', errorData);
         alert(`Failed to submit vote: ${errorData.detail || 'Unknown error'}`);
       }
     } catch (error) {
-      console.error('Error submitting vote:', error);
+      console.error('❌ Exception during vote submission:', error);
+      console.log('   - Error type:', typeof error);
+      console.log('   - Error message:', error.message);
+      console.log('   - Full error:', error);
       alert('Failed to submit vote. Please try again.');
     } finally {
+      console.log('🏁 Vote submission process completed');
       setSubmitting(false);
     }
   };

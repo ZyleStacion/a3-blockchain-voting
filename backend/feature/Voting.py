@@ -39,8 +39,18 @@ async def create_vote_transaction(user_id: int, proposal_id: int, tickets: int):
         return {"success": False, "message": f"Proposal ID {proposal_id} not found."}
     print(f"✅ Proposal found: {proposal.get('title', 'N/A')}")
 
-    tx_id = f"vote_{user_id}_{proposal_id}_{tickets}"
+    # Create unique transaction ID with timestamp to prevent duplicates
+    tx_id = f"vote_{user_id}_{proposal_id}_{tickets}_{int(time.time())}"
     print(f"🏷️  Step 3: Created transaction ID: {tx_id}")
+    
+    # Debug: Show recent transactions for comparison
+    if len(blockchain.chain) > 0:
+        recent_blocks = blockchain.chain[-3:] if len(blockchain.chain) >= 3 else blockchain.chain
+        print(f"🔍 Recent blockchain transactions:")
+        for block in recent_blocks:
+            for tx in block.get("transactions", []):
+                if tx.get("id", "").startswith("vote_"):
+                    print(f"   - Block {block.get('index')}: {tx.get('id')}")
 
     vote_tx = Transactions(
         transaction_id=tx_id,
@@ -48,11 +58,32 @@ async def create_vote_transaction(user_id: int, proposal_id: int, tickets: int):
         charity_receive=int(proposal_id),
         ticket_sent=tickets
     )
-    print(f"📝 Step 4: Created transaction object: sender={vote_tx.sender}, receiver={vote_tx.charity_receive}, amount={vote_tx.ticket_sent}")
+    print(f"📝 Step 4: Created transaction object:")
+    print(f"   - transaction_id: {vote_tx.ids}")
+    print(f"   - sender: {vote_tx.sender}")
+    print(f"   - charity_receive: {vote_tx.charity_receive}")
+    print(f"   - ticket_sent: {vote_tx.ticket_sent}")
 
     # 4) Insert vote into blockchain pending pool
     print(f"🔗 Step 5: Inserting transaction into blockchain pending pool...")
     print(f"   Current pending transactions: {len(blockchain.pending_transactions)}")
+    
+    # Debug: Check if transaction ID already exists anywhere
+    existing_in_chain = False
+    for block in blockchain.chain:
+        for tx in block.get("transactions", []):
+            if tx.get("id") == tx_id:
+                existing_in_chain = True
+                print(f"🔍 Found duplicate transaction ID in block {block.get('index')}: {tx_id}")
+                break
+    
+    if existing_in_chain:
+        print(f"❌ Transaction ID {tx_id} already exists in blockchain")
+    
+    existing_in_pending = any(tx.get("id") == tx_id for tx in blockchain.pending_transactions)
+    if existing_in_pending:
+        print(f"❌ Transaction ID {tx_id} already exists in pending transactions")
+    
     valid = blockchain.insert_transaction(vote_tx)
     if not valid:
         print(f"❌ Failed to insert transaction - duplicate or invalid")
