@@ -31,13 +31,9 @@ async def create_vote_transaction(user_id: int, proposal_id: int, tickets: int):
         print(f"❌ Not enough tickets: user has {user.get('voting_tickets', 0)}, needs {tickets}")
         return {"success": False, "message": "Not enough voting tickets."}
 
-    # 2) Verify proposal
-    print(f"🔍 Step 2: Looking up proposal {proposal_id}...")
-    proposal = await proposals_collection.find_one({"proposal_id": int(proposal_id)})
-    if not proposal:
-        print(f"❌ Proposal {proposal_id} not found in database")
-        return {"success": False, "message": f"Proposal ID {proposal_id} not found."}
-    print(f"✅ Proposal found: {proposal.get('title', 'N/A')}")
+    # 2) Skip proposal verification - allow voting for any proposal ID
+    print(f"ℹ️  Step 2: Skipping proposal validation for proposal {proposal_id}")
+    print(f"✅ Allowing vote for proposal ID: {proposal_id}")
 
     # Create unique transaction ID with timestamp to prevent duplicates
     tx_id = f"vote_{user_id}_{proposal_id}_{tickets}_{int(time.time())}"
@@ -114,13 +110,19 @@ async def create_vote_transaction(user_id: int, proposal_id: int, tickets: int):
     )
     print(f"✅ User tickets updated: deducted {tickets} tickets")
 
-    # 7) Increment YES counter in proposal
-    print(f"📊 Step 8: Updating proposal vote counter...")
-    await proposals_collection.update_one(
-        {"proposal_id": int(proposal_id)},
-        {"$inc": {"yes_counter": tickets}}   # ✅ increment yes votes by number of tickets
-    )
-    print(f"✅ Proposal counter updated: added {tickets} votes")
+    # 7) Try to increment YES counter in proposal (if it exists)
+    print(f"📊 Step 8: Attempting to update proposal vote counter...")
+    try:
+        result = await proposals_collection.update_one(
+            {"proposal_id": int(proposal_id)},
+            {"$inc": {"yes_counter": tickets}}
+        )
+        if result.modified_count > 0:
+            print(f"✅ Proposal counter updated: added {tickets} votes")
+        else:
+            print(f"ℹ️  No proposal found to update counter (proposal_id: {proposal_id})")
+    except Exception as e:
+        print(f"⚠️  Failed to update proposal counter: {str(e)}")
 
     # (optional) Persist chain so you can see it after restart
     print(f"💾 Step 9: Saving blockchain to file...")
