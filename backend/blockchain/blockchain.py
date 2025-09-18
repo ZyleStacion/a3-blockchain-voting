@@ -117,14 +117,27 @@ class Blockchain:
 
     # ---- Block ----
     def auto_mine_block(self, data: str = "Vote Block") -> dict:
+        print(f"⛏️ BLOCKCHAIN: auto_mine_block called with data='{data}'")
+        
         if not self.pending_transactions:
+            print(f"❌ BLOCKCHAIN: No pending transactions to mine")
             return None
 
+        print(f"📋 BLOCKCHAIN: Mining {len(self.pending_transactions)} pending transactions")
+        
         previous_block = self.get_previous_block()
         previous_proof = previous_block["proof"]
         index = previous_block["index"] + 1
+        
+        print(f"🔍 BLOCKCHAIN: Previous block info:")
+        print(f"   - Index: {previous_block['index']}")
+        print(f"   - Hash: {previous_block.get('hash', 'N/A')[:20]}...")
+        print(f"   - Proof: {previous_proof}")
+        print(f"📦 BLOCKCHAIN: Creating new block with index {index}")
 
         proof = self.proof_of_work(previous_proof, index, data)
+        print(f"🎯 BLOCKCHAIN: Proof of work completed: {proof}")
+        
         previous_hash = self.hash_value(previous_block)
 
         block = self.create_block(
@@ -133,11 +146,18 @@ class Blockchain:
             previous_hash=previous_hash,
             index=index
         )
+        
+        print(f"✅ BLOCKCHAIN: Block created successfully!")
+        print(f"   - Block index: {block['index']}")
+        print(f"   - Block hash: {block.get('hash', 'N/A')[:20]}...")
+        print(f"   - Transactions in block: {len(block.get('transactions', []))}")
 
         self.difficulty_adjustment()
 
         # 🟢 Save chain every time a block is mined
+        print(f"💾 BLOCKCHAIN: Saving chain to file...")
         self.save_chain()
+        print(f"✅ BLOCKCHAIN: Chain saved successfully")
 
         return block
 
@@ -282,18 +302,27 @@ class Blockchain:
         Returns:
             _type_: True if insert transactions succesfully, if fail to insert false
         """
+        print(f"🔗 BLOCKCHAIN: insert_transaction called")
+        print(f"   - Transaction type: {type(transaction)}")
+        
         if not isinstance(transaction, Transactions):
+            print(f"❌ BLOCKCHAIN: Transaction is not instance of Transactions class")
             return False
 
         tx = transaction.to_dict()
+        print(f"   - Transaction dict: {tx}")
 
         if not self.validate_transaction(tx):
+            print(f"❌ BLOCKCHAIN: Transaction validation failed")
             return False
 
         if self.exists_transactions(tx["id"]):
+            print(f"❌ BLOCKCHAIN: Transaction with ID {tx['id']} already exists")
             return False
 
         self.pending_transactions.append(tx)
+        print(f"✅ BLOCKCHAIN: Transaction added to pending pool")
+        print(f"   - New pending count: {len(self.pending_transactions)}")
 
         return True
 

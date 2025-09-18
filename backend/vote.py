@@ -61,12 +61,26 @@ async def create_proposal_endpoint(request: VoteProposalCreate):
 
 @vote_router.post("/submit-vote")
 async def submit_vote_endpoint(request: VoteSubmit):
-    # Pass the 'tickets' field from the request body
-    return await create_vote_transaction(
-        user_id=request.user_id,
-        proposal_id=request.proposal_id,
-        tickets=request.tickets
-    )
+    print(f"🗳️ VOTE ENDPOINT CALLED")
+    print(f"📥 Request received:")
+    print(f"   - user_id: {request.user_id} (type: {type(request.user_id)})")
+    print(f"   - proposal_id: {request.proposal_id} (type: {type(request.proposal_id)})")
+    print(f"   - tickets: {request.tickets} (type: {type(request.tickets)})")
+    
+    try:
+        # Pass the 'tickets' field from the request body
+        print(f"🔄 Calling create_vote_transaction...")
+        result = await create_vote_transaction(
+            user_id=request.user_id,
+            proposal_id=request.proposal_id,
+            tickets=request.tickets
+        )
+        print(f"📤 Vote transaction result: {result}")
+        return result
+    except Exception as e:
+        print(f"❌ Exception in submit_vote_endpoint: {str(e)}")
+        print(f"   - Exception type: {type(e)}")
+        raise HTTPException(status_code=500, detail=f"Vote submission failed: {str(e)}")
 
 
 async def update_charity_status(charity: dict):

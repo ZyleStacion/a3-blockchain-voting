@@ -237,5 +237,22 @@
         "previous_hash": "4e6dab4a61df95835598326c9a9c1481d3362f150ee3fb48a540d4c790943a51",
         "difficulty": 3,
         "hash": "fcc2b4509f692f9911a572409f145db60d22e8ecfdc84df694bdebbd5454b4ae"
+    },
+    {
+        "index": 14,
+        "timestamp": "2025-09-18 10:59:15.364663",
+        "data": "Vote Block",
+        "transactions": [
+            {
+                "id": "vote_1_100_1_1758167955",
+                "sender": 1,
+                "charity_receive": 100,
+                "ticket_sent": 1
+            }
+        ],
+        "proof": 4349,
+        "previous_hash": "fcc2b4509f692f9911a572409f145db60d22e8ecfdc84df694bdebbd5454b4ae",
+        "difficulty": 3,
+        "hash": "2885e699379f516ac92d113a4f7636563f3c04e43de57af75299b9e390b4d545"
     }
 ]
