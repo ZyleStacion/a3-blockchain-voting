@@ -1,8 +1,7 @@
-import datetime
-import uuid
-from db.schemas import TicketPurchase, TicketResponse
+from fastapi import HTTPException
+from db.schemas import TicketPurchase
 from db.database import users_collection
-from feature.voting import start_new_voting_period, THRESHOLD_AMOUNT
+
 
 def calculate_qv_cost(tickets: int) -> int:
     """Calculates the quadratic cost of purchasing tickets."""

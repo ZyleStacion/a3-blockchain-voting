@@ -220,22 +220,5 @@
         "previous_hash": "3c73ceb312bb17fb62b378ba1ff70449332c9190b1bd3776d7ff8584713a9c08",
         "difficulty": 3,
         "hash": "4e6dab4a61df95835598326c9a9c1481d3362f150ee3fb48a540d4c790943a51"
-    },
-    {
-        "index": 13,
-        "timestamp": "2025-09-17 22:25:59.580732",
-        "data": "Vote Block",
-        "transactions": [
-            {
-                "id": "vote_1_100_1",
-                "sender": "1",
-                "receiver": "100",
-                "amount": 1
-            }
-        ],
-        "proof": 5334,
-        "previous_hash": "4e6dab4a61df95835598326c9a9c1481d3362f150ee3fb48a540d4c790943a51",
-        "difficulty": 3,
-        "hash": "fcc2b4509f692f9911a572409f145db60d22e8ecfdc84df694bdebbd5454b4ae"
     }
 ]

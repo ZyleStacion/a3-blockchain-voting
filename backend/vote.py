@@ -22,35 +22,48 @@ async def buy_tickets_endpoint(request: TicketPurchase):
 async def create_proposal_endpoint(request: VoteProposalCreate):
     proposal_id = await get_next_proposal_id()
 
-    # 1) Check if charity exists
+    # 1) Normalize charity_id (allow int or str in DB)
     charity = await charities_collection.find_one({"charity_id": request.charity_id})
     if not charity:
-        raise HTTPException(status_code=404, detail=f"Charity ID {request.charity_id} not found")
+        charity = await charities_collection.find_one({"charity_id": str(request.charity_id)})
 
-    # 2) Build the proposal document
+    if not charity:
+        raise HTTPException(
+            status_code=404,
+            detail=f"Charity ID {request.charity_id} not found"
+        )
+
+    # 2) Build the proposal document (always embed charity)
     proposal_data = {
-        "proposal_id": proposal_id,
+        "proposal_id": int(proposal_id),
         "title": request.title,
         "description": request.description,
         "yes_counter": 0,
-        "charity": {   # ✅ embed charity reference
+        "charity": {
             "charity_id": charity["charity_id"],
             "name": charity["name"],
-            "contact_email": charity.get("contact_email")
-        }
+            "contact_email": charity.get("contact_email", None),
+        },
+        "created_at": datetime.utcnow()
     }
 
     # 3) Insert into MongoDB
     result = await proposals_collection.insert_one(proposal_data)
-
     if not result.inserted_id:
-        raise HTTPException(status_code=500, detail="Failed to create proposal")
+        raise HTTPException(
+            status_code=500,
+            detail="Failed to create proposal"
+        )
 
+    # 4) Response payload
     return {
         "success": True,
         "id": proposal_id,
+        "title": request.title,
+        "charity": charity["name"],
         "message": f"Proposal '{request.title}' created successfully for charity '{charity['name']}'."
     }
+
 
 
 @vote_router.post("/submit-vote")

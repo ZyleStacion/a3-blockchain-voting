@@ -48,7 +48,7 @@ async def create_vote_transaction(user_id: int, proposal_id: int, tickets: int):
         charity_receive=int(proposal_id),
         ticket_sent=tickets
     )
-    print(f"📝 Step 4: Created transaction object: sender={vote_tx.sender}, receiver={vote_tx.receiver}, amount={vote_tx.amount}")
+    print(f"📝 Step 4: Created transaction object: sender={vote_tx.sender}, receiver={vote_tx.charity_receive}, amount={vote_tx.ticket_sent}")
 
     # 4) Insert vote into blockchain pending pool
     print(f"🔗 Step 5: Inserting transaction into blockchain pending pool...")

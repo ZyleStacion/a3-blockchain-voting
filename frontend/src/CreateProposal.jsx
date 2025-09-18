@@ -49,6 +49,13 @@ function CreateProposal() {
     setLoading(true);
     setError('');
 
+    // ✅ prevent submitting with no charity
+    if (!formData.charity_id) {
+      setError("Please select a charity before submitting.");
+      setLoading(false);
+      return;
+    }
+
     try {
       const response = await fetch('http://localhost:8000/vote/create-proposal', {
         method: 'POST',
@@ -58,13 +65,29 @@ function CreateProposal() {
         body: JSON.stringify({
           title: formData.title,
           description: formData.description,
-          charity_id: parseInt(formData.charity_id)
+          // ✅ always send integer to match FastAPI schema
+          charity_id: parseInt(formData.charity_id, 10)
         })
       });
 
       if (!response.ok) {
         const errorData = await response.json();
-        throw new Error(errorData.detail || 'Failed to create proposal');
+        let message = 'Failed to create proposal';
+
+        if (errorData.detail) {
+          if (typeof errorData.detail === 'string') {
+            message = errorData.detail;
+          } else if (Array.isArray(errorData.detail)) {
+            // FastAPI validation errors
+            message = errorData.detail
+              .map(err => `${err.loc.join('.')} - ${err.msg}`)
+              .join('; ');
+          } else if (typeof errorData.detail === 'object') {
+            message = JSON.stringify(errorData.detail);
+          }
+        }
+
+        throw new Error(message);
       }
 
       const result = await response.json();
@@ -157,8 +180,8 @@ function CreateProposal() {
               >
                 <option value="">Choose a charity...</option>
                 {charities.map((charity) => (
-                  <option key={charity.charity_id} value={charity.charity_id}>
-                    {charity.name} - {charity.contact_email}
+                  <option key={charity.charity_id} value={String(charity.charity_id)}>
+                    {charity.charity_id} — {charity.name} ({charity.contact_email || 'no email'})
                   </option>
                 ))}
               </select>
@@ -210,7 +233,11 @@ function CreateProposal() {
             </p>
           </div>
           
-          {error && <div className="error-message">{error}</div>}
+          {error && (
+            <div className="error-message" style={{ color: 'red', marginTop: '10px' }}>
+              {error}
+            </div>
+          )}
           
           <button 
             type="submit" 
